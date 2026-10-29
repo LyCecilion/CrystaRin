@@ -1861,7 +1861,11 @@ else
 
 > If `size` is 0, then `malloc()` returns a unique pointer value that can later be successfully passed to free(). (See "Nonportable behavior" for portability issues.)
 
-在 `length = 0` 即 `malloc(0)` 时，glibc 通常会返回一个可 `free()` 的最小 chunk 指针。从而在后文 `cl_read_n(fd, buf, 0)` 时，这块内存不会自动清零，而 `client` 也不会写入新数据。而上文我们已经展示了 `get_pw` 的越界读能力，它将会读取后续堆块的旧数据，这即泄露了一些数据。事实上（*这里有待进一步考究*）这里泄露的数据是 `heap_base >> 12`，它是可还原的。从而我们通过 fake user 实现的 heap leak，较通过 `get_pw` 实现的是更强的。
+在 `length = 0` 即 `malloc(0)` 时，glibc 通常会返回一个可 `free()` 的最小 chunk 指针。从而在后文 `cl_read_n(fd, buf, 0)` 时，这块内存不会自动清零，而 `client` 也不会写入新数据。而上文我们已经展示了 `get_pw` 的越界读能力，它将会读取后续堆块的旧数据，这即泄露了一些数据。
+
+事实上，这里泄露的数据正是 `heap_base >> 12`，它是可还原的。具体地，`cl_await_res` 先 `malloc(0x10)` 取 response 结构体、再 `malloc(size)` 取数据缓冲区；`size = 0` 时 glibc 回落到 0x20 的 chunk，而这个 chunk 通常恰是上一条 response 被 `cl_free_res` 释放回 0x20 tcache bin 的那一块。`tcache_get` 只清 `key` 而不清 `next`，故其首 qword 仍是 safe-linking 写入的 `chunk_addr >> 12`。本题中该 chunk 落在堆的第一页内，于是它恰好等于 `heap_base >> 12`，左移 12 位即可还原 `heap_base`。
+
+从而我们通过 fake user 实现的 heap leak，较通过 `get_pw` 实现的是更强的。
 
 ##### libc leak 链
 
@@ -1870,10 +1874,14 @@ GPT-5.4 爆破得到了一条稳定的 libc leak 链路。
 对于一个 unsorted bin，其 chunk 的用户区开头通常具有 `fd` 和 `bk` 指针。若 unsorted bin 内仅存在 1 个 chunk，则我们期望
 
 ```c
-fd == bk == &main_arena.unsorted_bin_head
+fd == bk == bin_at(main_arena, 0)
 ```
 
-考虑 `add_pw()` 最终会在 service 侧 `malloc(size)`。GPT-5.4 通过在布置 fake user `u2` 后注册 `u1`，并在 `u1` 处连续 add 10 个 `0xfe` 大小的块后再 delete，便从 `heap + 0xf60` 处的 freed chunk 中获得了一个稳定的 libc 指针 `main_arena + 0x203b20`。（*这里有待进一步考究*）
+注意 glibc 是以 `bin_at` 的形式让 bin 头参与链表的：`bin_at(m, i) = &m->bins[(i - 1) * 2] - offsetof(struct malloc_chunk, fd)`，因此它比 `&bins[0]` 低 `0x10`。本题的 glibc 2.39 中 `main_arena` 位于 `libc + 0x203ac0`，`bins` 数组位于 `main_arena + 0x70`，于是该哨兵值为 `main_arena + 0x60`，即 `libc + 0x203b20`。
+
+考虑 `add_pw()` 最终会在 service 侧 `malloc(size)`。请求 `0xfe` 字节对应大小为 `0x110` 的 chunk；在布置 fake user `u2` 后注册 `u1`，并在 `u1` 处连续 add 10 个 `0xfe` 大小的块后再依次 delete：前 7 个被 tcache 收下（每个 bin 上限 7 个），第 8 个（chunk 头位于 `heap + 0xf50`）被释放进此时为空的 unsorted bin，其 `fd` 与 `bk` 都被写成 `bin_at(main_arena, 0) = libc + 0x203b20`；随后第 9、10 个释放时与 top 反向合并，top 前移到 `heap + 0xf50`，但前者的 user data 并不会因此被清除。于是从 `heap + 0xf60` 读到的 `fd` 就是一个稳定的 libc 指针 `libc + 0x203b20`。
+
+需要留意，此时它已不是仍在 unsorted bin 中的 chunk，而是并入 top 之后残留于 top 空闲区里的旧链表值。这条链路由 GPT-5.4 爆破得到。
 
 在 `pwndbg` 中调试可以复现这一点。需要注意的是，由于该程序采用 client/service 双进程 fork，我们需要设置
 
@@ -1887,7 +1895,9 @@ set schedule-multiple on
 
 ##### 泄露 `service` 栈
 
-考虑本题开启了栈保护和 ASLR。由上文我们提到的越界读，通过 fake user `u3` 令 `slot0` 为 `(8, libc + environ)`，则可以使用 `get(0)` 直接读取 `environ`。注意到 `environ - 0x15f` 为 canary 的高 7 字节，`environ - 0x150` 可以得到 PIE return addr，这即使我们具备了绕过栈保护和 ASLR 的条件。（*这里有待进一步考究*）
+考虑本题开启了栈保护和 ASLR。由上文我们提到的越界读，通过 fake user `u3` 令 `slot0` 为 `(8, libc + environ)`，则可以使用 `get(0)` 直接读取 `environ`。注意到 `environ - 0x15f` 为 canary 的高 7 字节，`environ - 0x150` 可以得到 PIE return addr，这即使我们具备了绕过栈保护和 ASLR 的条件。
+
+这里的偏移之所以是常数，是因为 `environ` 指向栈顶的 argv/envp 数组区，而该数组区自 `argc` 向上连续排布，其与 entry frame 的距离只取决于 `argc`，与环境变量的内容无关。动态调试可得 `service_rbp = environ - 0x158`：`service` 的 canary 槽在 `service_rbp - 8 = environ - 0x160`，其最低字节为 `\0`，故 `environ - 0x15f` 起的 7 字节即 canary 的高位；`service` 的返回地址在 `service_rbp + 8 = environ - 0x150`，实测为 `main` 中 `service` 调用点的下一条指令（`pie + 0x32d9`）。由于同一线程内 `fs:0x28` 唯一，这份 canary 可直接用于 `srv_handle_bug` 的栈保护校验。
 
 #### 关于 `upload` 逻辑
 
@@ -1966,7 +1976,7 @@ service -> srv_parse_pkt -> srv_handle_pkt -> srv_handle_bug
 - `0x198`：`parse` saved rip
 - `0x1ac`：`service` 局部变量 `fd`
 
-（*这里有待进一步考究*）
+其中 bug buffer 即 `srv_handle_bug` 的 `v16`，位于 `rbp - 0x110`（可由 `0x2ca7` 的 `lea rcx, [rbp - 0x110]` 确认），故 canary 恰在 `0x108`。`0x110` 与该帧的 saved rbp 重合——我们的 payload 用它把 `parse_rbp` 一路传递下去；`0x118` 是 saved rip；`0x120` 则是 ret 之后紧接着的一格，跳进 `srv_send_flag` 后它即成为后者的返回地址。`0x190` 与 `0x198` 分别是 `srv_parse_pkt` 的 saved rbp 与 saved rip（实测 `parse_rbp = bug_buffer + 0x190`），`0x1ac` 是 `service` 的局部变量 `fd`（`service: mov [rbp - 0x274], edi`，而 `service_rbp = bug_buffer + 0x420`）。
 
 我们前文提到了 `srv_handle_bug` 的栈溢出漏洞，并获得了通过 `service` 栈泄露 Canary 和 PIE base 的能力。下面给出大体攻击流程：我们泄露 Canary 和 PIE base 后，首先覆写 `srv_handle_bug` 的栈，使其完成 canary 检查后 `ret` 至 `srv_send_flag`。
 
@@ -2058,7 +2068,7 @@ __int64 srv_send_flag()
 泄漏/堆相关。
 
 - `heap + 0xf60`：用于 libc leak 的 freed password chunk
-- `libc leak = main_arena + 0x203b20`
+- `libc leak = libc + 0x203b20`（即 `main_arena + 0x60`，unsorted bin 的 `bin_at` 哨兵）
 - `environ = libc + libc.symbols["environ"]`
 
 栈相关。
@@ -2209,8 +2219,8 @@ class Exploit:
         self.upload(seed_user(0x20, pw_chunk), b"l2")
         self.signup(b"u2")
 
-        # u1: allocate/free 10 x 0x110 chunks. Empirically, the chunk at
-        # heap+0xf60 carries a stable main_arena pointer afterwards.
+        # u1: allocate/free 10 x 0x110 chunks. The 8th free goes into the then
+        # empty unsorted bin; heap+0xf60 keeps the stale bin_at(main_arena, 0).
         self.signup(b"u1")
         self.login(b"u1")
         pw = b"P" * 0xFE
