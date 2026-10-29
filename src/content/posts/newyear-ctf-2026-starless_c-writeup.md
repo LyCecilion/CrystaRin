@@ -1,24 +1,20 @@
 ---
-title: NewYear CTF 2026 题解
-published: 2026-02-22 12:36:42
+title: NewYear CTF 2026 starless_c 题解
+published: 2026-02-22
 description: 这真是新年让小水母做的题吗？畏惧了……求放过。
 # tags:
 # category:
 ---
 
-零音新年两天纯玩了，根本没时间做题。其实感觉 NewYear CTF 的时间可以延长一下，至少延长到一周吧……跨年期间真没时间做 CTF 诶。
+零音新年两天纯玩了，根本没时间做题，只完成了 starless_c 一道题，这里给出记录。其实感觉 NewYear CTF 的时间可以延长一下，至少延长到一周吧。跨年期间真没时间做 CTF 诶。
 
-## 逆向工程 / Reverse
+> A person this far into a challenge has their path to follow. There were many paths, once, in a time that is past, lost many bytes and pages ago. Now there is only one path for you to choose. The path that leads to the **flag**.
+>
+> 入局至深，径行有常。\
+> 往昔万径丛生，皆随浮光掠影，没于卷轴字节之间。\
+> 今尔所向，别无他选。唯此孤径，直指 **终末之旗**。
 
-### starless_c
-
-{% blockquote %}
-A person this far into a challenge has their path to follow. There were many paths, once, in a time that is past, lost many bytes and pages ago. Now there is only one path for you to choose. The path that leads to the **flag**.
-
-入局至深，径行有常。
-往昔万径丛生，皆随浮光掠影，没于卷轴字节之间。
-今尔所向，别无他选。唯此孤径，直指 **终末之旗**。
-{% endblockquote %}
+## 题目
 
 本题的附件 `starless_c` 是一个无标准库、去符号化、纯 syscall 的 ELF 文件。使用 IDA Pro 分析，仅可看到 `start` 和 `sub_6767900C` 两个函数。首先看到 `start` 函数。
 
@@ -64,11 +60,11 @@ void setup_stealth_signal()
 
 我们使用 IDA Pro 继续跟进到游戏主逻辑。事实上，集中注意力，我们可以发现，在程序的 `LOAD` 段（程序运行时必须被加载到内存中的内容）存在大量 `0x1000` 字节的页（即 page，若参照题目的表述；页的大小由 IDA Pro 得到的汇编代码中的 `align 1000h` 可得）。下面的图片截取自一个起自 `0x67679000` 的页。
 
-{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/NewYear-CTF-2026-Writeup/view_pages_in_ida_pro.png download:true fancybox:true ratio:1104/395 %}
+![在 IDA Pro 中查看从 0x67679000 开始的内存页及其汇编代码](./newyear-ctf-2026-starless_c-writeup/view_pages_in_ida_pro.png)
 
 对于注意力欠佳的朋友，我们也可以通过 `readelf` 发现这一点。观察到 `LOAD` 段中大多数页的 `Offset FileSiz` 均为 `0x1000`。
 
-{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/NewYear-CTF-2026-Writeup/get_pages_via_readelf.png download:true fancybox:true ratio:1566/952 %}
+![使用 readelf 查看 LOAD 段中大小为 0x1000 的内存页](./newyear-ctf-2026-starless_c-writeup/get_pages_via_readelf.png)
 
 我们预先进行解释：事实上，这是一个迷宫内的推箱子游戏。内存中分配了一块块大小为 `0x1000` 字节的内存空间，每一页都代表该迷宫中的一个格子。由任意页的汇编代码，如
 
@@ -173,6 +169,8 @@ case 'a': // 向左走
 这便可以理解为推箱子游戏。迷宫中的每一个位置（包括空位和箱子）都具有一个页，事实上，它们的页的结构是完全一致的，唯一的差别是，空位页的开头是 `0x88c031`，使得 Flag 校验机制跳转到这里时会造成 SIGSEGV；而箱子页的开头是 `0x90909090`，使得 Flag 校验机制跳转到这里后会向后继续滑动。倘若我们向左走而左侧有箱子，则我们会将箱子推到更左侧一格的位置。（当然，程序并未校验箱子的位置的左侧是否仍有箱子，这即，若我们将箱子推向箱子，则两个箱子会合二为一，一个箱子会丢失。）在完成页首的交换后，程序进入偏移 `+0x0C` 处，这是为了绕过刚刚交换来的 `0x88c031`，直接进入下一轮的 `w/s/a/d/f` 的判定过程。
 
 考虑一个箱子页，当 Flag 校验机制跳转到这里后，因为页开头的 4 个 NOP，它会自动顺延到后文。我们在 `loc_6767A000` 中已经见识到，一个含有 SIGSEGV 的崩溃陷阱通常会进行 `xor -> mov` 后再 `jmp` 到下文，而陷阱 `xor -> mov` 恰占据 4 个字节的位置，使得箱子页开头的 4 个字节的 `NOP` 可以完全覆盖该陷阱。从而我们完全明白了下面的做法：**我们需要在一个由 23 个格子（结点）所构成的连通图中，确保箱子不互相碰撞地推动位于初始位置的 5 个箱子到 Flag 校验机制将要跳转到的 5 个位置，使得 Flag 校验机制在跳转到对应位置时有 4 个 NOP 接应并能滑动到下一个判定位置，最终到达显示 Flag 的逻辑。**
+
+## 解答
 
 下面给出一个可行的 Exploit 脚本，该脚本由 Codex 在零音的帮助下完成。
 
