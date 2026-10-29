@@ -322,7 +322,7 @@ $$
 
 考虑一个四个方向都能组成 $\mathrm{EEVEE}$ 的 $\mathrm{V}$，其初始权重是 $4/3$，周围的局部形状可以画成：
 
-![四方向成词的 V](./images/agmc-2026-02-p14-v4.svg)
+![四方向成词的 V](./agmc-2026-02-high-school-round-2-solutions/agmc-2026-02-p14-v4.svg)
 
 图中四个标出的 $\mathrm{E}$ 是中心 $\mathrm{V}$ 在水平、竖直方向距离 $2$ 的格子. 对每一个这样的 $\mathrm{V}$，把它的权重减少 $5/9$，再给这四个 $\mathrm{E}$ 各增加 $5/36$. 这是守恒的，因为
 
@@ -348,7 +348,7 @@ $$
 
 如果一个 $\mathrm{E}$ 被 $8$ 个单词包含，那么四个方向上都恰好有两个单词. 由三个观察可以核查出：它附近必然出现四个可以接收转移的 $\mathrm{V}$. 局部上有两种互为对称的排列，但两种排列都可以进行如下守恒转移：
 
-![E 的守恒权重转移示意](./images/agmc-2026-02-p14-charge-flow.svg)
+![E 的守恒权重转移示意](./agmc-2026-02-high-school-round-2-solutions/agmc-2026-02-p14-charge-flow.svg)
 
 从这个 $\mathrm{E}$ 的权重中减去
 

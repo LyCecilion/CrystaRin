@@ -14,12 +14,12 @@
 #let arrow = (end: (symbol: "stealth", scale: 1))
 
 #canvas(length: 1pt, {
-  // 底板：白纸，保证在深色主题下同样清晰
+  // 浅色底板，保证在深色主题下同样清晰
   draw.rect(
     (0.5, 0.5),
     (419.5, 224.5),
     radius: 12,
-    fill: white,
+    fill: rgb("#F9FFFD"),
     stroke: 0.6pt + ink.transparentize(88%),
   )
 

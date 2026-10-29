@@ -16,12 +16,12 @@
 #let amount = text(size: 11pt)[$ + 5/36 $]
 
 #canvas(length: 1pt, {
-  // 底板：白纸，保证在深色主题下同样清晰
+  // 浅色底板，保证在深色主题下同样清晰
   draw.rect(
     (0.5, 0.5),
     (389.5, 299.5),
     radius: 12,
-    fill: white,
+    fill: rgb("#F9FFFD"),
     stroke: 0.6pt + ink.transparentize(88%),
   )
   // 中心 V 所在的横行与竖列（EEVEE 的两条读取线）
