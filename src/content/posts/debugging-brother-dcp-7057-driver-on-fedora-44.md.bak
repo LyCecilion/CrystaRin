@@ -1,0 +1,385 @@
+---
+title: Fedora 44 上调试 Brother DCP-7057 驱动全记录
+date: 2026-07-19 14:00:00
+tags:
+- Linux
+- Fedora
+- CUPS
+- SELinux
+- 打印机
+- Brother
+- debugging
+categories:
+- Linux
+description: 一场横跨 RPM 校验失败、SELinux 权限迷宫、32 位二进制残影与 CUPS 页数幽灵的排障之旅。
+article:
+  style: tech
+  author: limityrochen
+  ai_label: generated
+render:
+  math: false
+---
+
+<!--markdownlint-disable MD014 MD026 MD033 MD034-->
+
+## 零 · 在一切开始之前
+
+洛汐只是想让打印机吐一张纸。
+
+洛汐把角落里那台 Brother DCP-7057 激光打印机的 USB 线插到电脑上，右上角立刻提示连上了打印机。Linux 真的是太棒了——至少内核已经认出这台设备，事情看起来有了一个好开头。洛汐有些开心，但还是不太放心：自从换到 Fedora 之后，自己还没有用过打印机呢。洛汐还是去了官网，下了 `linux-brprinter-installer-2.2.6-0`，跑起来。
+
+```bash
+$ sudo ./linux-brprinter-installer-2.2.6-0
+Input model name ->DCP-7057
+```
+
+一路 `y` 到底。脚本下载了四个 RPM——`dcp7057lpr`、`cupswrapperDCP7057`、`brscan4`、`brscan-skey`——逐一尝试安装，甚至贴心地在 CUPS 里注册了打印机队列，最后问了句——
+
+```text
+Test Print? [y/N] ->y
+wait 5s.
+lpr -P DCP7057 /usr/share/cups/data/testprint
+```
+
+洛汐等着打印机发出那熟悉的嗡鸣声——可等来的只有自己的呼吸。
+
+打印机安安静静地坐在桌子上，像一只睡着了的猫。洛汐盯着它看了三十秒，确认它确实没有吐纸的打算。然后洛汐打开了终端。后来洛汐会意识到——这个看似简单的安装脚本背后，藏着两道彼此相套的门：一道是旧 RPM 与新版 rpm 的校验断层，另一道是手动解包后被一并带进系统的 SELinux 标签。
+
+但那是后来的事了。此刻的洛汐还天真地以为「重启一下就好了」。
+
+## 一 · CUPS…还活着吗？
+
+洛汐的第一个念头是——是不是 CUPS 没跑。先排除最蠢的可能。
+
+```bash
+$ rpm -q cups
+cups-2.4.19-3.fc44.x86_64
+
+$ systemctl status cups
+● cups.service - CUPS Scheduler
+     Loaded: loaded (/usr/lib/systemd/system/cups.service; disabled; preset: disabled)
+     Active: active (running) since Sun 2026-07-19 09:48:43 CST; 31min ago
+   Main PID: 1641 (cupsd)
+     Status: "Scheduler is running..."
+```
+
+CUPS 活着，进程在跑，安装的是 Fedora 44 当前的 CUPS 2.4.19。至少服务状态没有立刻暴露问题。日志里甚至能辨认出刚才那条测试页的痕迹——它确实被接收了，只不过打印机纹丝不动。
+
+洛汐顺手补了一刀：
+
+```bash
+$ sudo systemctl enable cups
+Created symlink '/etc/systemd/system/printer.target.wants/cups.service' → '/usr/lib/systemd/system/cups.service'.
+Created symlink '/etc/systemd/system/multi-user.target.wants/cups.service' → '/usr/lib/systemd/system/cups.service'.
+```
+
+Fedora 也可以通过 `cups.socket` 和 `cups.path` 按需拉起 CUPS，所以服务原先显示 `disabled` 并不等于它不会工作。不过洛汐还是把它改成了显式开机启动：这不是本次故障的修复，只是顺手把已经确认正常的零件拧紧。
+
+## 二 · 那么大一个驱动呢？
+
+脚本明明跑完了四个 RPM 的安装流程。来查一下。
+
+```bash
+$ rpm -qa | grep -iE 'dcp|cupswrapper|brscan'
+brscan4-0.4.11-2.x86_64
+```
+
+四个包里只装上了 `brscan4`。扫描仪驱动到了，打印驱动呢？
+
+```bash
+$ rpm -q dcp7057lpr
+package dcp7057lpr is not installed
+
+$ rpm -q cupswrapperDCP7057
+package cupswrapperDCP7057 is not installed
+
+$ rpm -q brscan-skey
+package brscan-skey is not installed
+```
+
+三连 not installed。小水母盯着终端恍惚了一秒钟——安装脚本的输出还在终端缓冲区里滚着，可脚本没有在子命令失败时停下，反而一路跑到了测试打印。看起来像是“安装完成”，实际上三个包根本不在系统里。
+
+洛汐重新跑了一次手动安装：
+
+```bash
+$ sudo rpm -ihv --nodeps --ignorearch dcp7057lpr-2.1.0-1.i386.rpm
+Verifying...  ################################# [100%]
+Preparing...  ################################# [100%]
+  package dcp7057lpr-2.1.0-1.i386 does not verify: no digest
+
+$ rpm -q dcp7057lpr
+package dcp7057lpr is not installed
+```
+
+Exit code 为 1。这两个 2010 年的 32 位 RPM 既没有签名，也没有 rpm 6 要求的包与包头校验摘要。Fedora 44 的 rpm 在 `Verifying` 阶段就中止了安装，根本没有进入需要“回滚”的安装事务。`--nodeps` 可以跳过依赖检查，`--ignorearch` 可以忽略架构不匹配，但它们对 `no digest` 都没有办法。
+
+错误信息其实明明白白地出现了，真正“静默”的是 Brother 安装器对返回值的态度：它调用 rpm 后不检查是否成功，依然把内部状态标记为已安装，然后继续往下跑。于是一条明确的 rpm 错误，被包在了一段看似顺利完成的总体流程里。
+
+洛汐对着屏幕吐了一个困惑的泡泡。既然 rpm 不让走正门，那就先把包拆开，看看这两块二进制漂流木里究竟装了什么……
+
+```bash
+$ rpm2cpio dcp7057lpr-2.1.0-1.i386.rpm | cpio -t
+./usr/local/Brother/Printer/DCP7057/inf/brDCP7057func
+./usr/local/Brother/Printer/DCP7057/inf/brDCP7057rc
+./usr/local/Brother/Printer/DCP7057/inf/paperinf
+./usr/local/Brother/Printer/DCP7057/lpd/filterDCP7057
+./usr/local/Brother/Printer/DCP7057/lpd/rawtobr3
+./usr/local/Brother/Printer/DCP7057/lpd/psconvert2
+./var/spool/lpd/DCP7057
+
+$ rpm2cpio cupswrapperDCP7057-2.0.4-2.i386.rpm | cpio -t
+./usr/local/Brother/Printer/DCP7057/cupswrapper/brcupsconfig4
+./usr/local/Brother/Printer/DCP7057/cupswrapper/cupswrapperDCP7057-2.0.4
+```
+
+洛汐打开一个临时目录，把两块旧时代的漂流木拆解开来。
+
+```bash
+$ mkdir -p /tmp/brother_extract
+$ cd /tmp/brother_extract
+$ rpm2cpio ~/Workspace/tmp/dcp7057lpr-2.1.0-1.i386.rpm | cpio -idm
+215 blocks
+$ rpm2cpio ~/Workspace/tmp/cupswrapperDCP7057-2.0.4-2.i386.rpm | cpio -idm
+75 blocks
+```
+
+然后一块块挪进系统的骨架里：
+
+```bash
+$ sudo cp -a usr/local/Brother /usr/local/
+$ sudo cp -a var/spool/lpd /var/spool/
+```
+
+{% note color:yellow 提醒 手动解包绕过了 RPM 的完整性校验、脚本执行与文件归属管理，也不会在 rpmdb 中留下安装记录。这只适用于已经独立确认下载来源与文件完整性的遗留包，不是通用的 RPM 安装方式。%}
+
+最后运行 CUPS wrapper 脚本——它会生成 PPD、注册队列、把一切缝合在一起：
+
+```bash
+$ sudo /usr/local/Brother/Printer/DCP7057/cupswrapper/cupswrapperDCP7057-2.0.4
+lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.
+```
+
+警告不碍事。洛汐更在意的是这些文件到底是什么——`file` 命令扫了一圈：
+
+```bash
+$ file /usr/local/Brother/Printer/DCP7057/lpd/rawtobr3
+ELF 32-bit LSB executable, Intel i386, version 1 (SYSV),
+dynamically linked, interpreter /lib/ld-linux.so.2,
+for GNU/Linux 2.2.0, not stripped
+
+$ file /usr/local/Brother/Printer/DCP7057/cupswrapper/brcupsconfig4
+ELF 32-bit LSB executable, Intel i386, version 1 (SYSV),
+dynamically linked, interpreter /lib/ld-linux.so.2,
+for GNU/Linux 2.2.0, not stripped
+```
+
+RPM 元数据显示，它们编译于 2010 年，而且是彻头彻尾的 32 位二进制：连动态链接器都指向 `/lib/ld-linux.so.2`。Brother 安装器为此主动要求 Fedora 安装 `glibc.i686` 和 `libstdc++.i686`。在 2026 年的 64 位系统上，这条兼容链居然还能接上，本身就有些不可思议。
+
+PPD 也成功落地了：
+
+```bash
+$ lpstat -p DCP7057
+printer DCP7057 is idle.  enabled since Sun 19 Jul 2026 10:27:04 AM CST
+
+$ ls /etc/cups/ppd/
+DCP7057.ppd
+```
+
+小水母信心满满地按下了第二发测试页。
+
+房间里继续鸦雀无声；只有新装的空调在低声鸣唱。
+
+## 三 · 继续审计！
+
+洛汐盯着 CUPS 的日志看了很久。`lpstat` 说任务已完成、队列已清空——但打印机没有任何动静。
+
+把 CUPS 日志级别调到 debug，重启服务，再打一发：
+
+```bash
+$ sudo sed -i 's/^LogLevel .*/LogLevel debug/' /etc/cups/cupsd.conf
+$ sudo systemctl restart cups
+
+$ lpr -P DCP7057 /usr/share/cups/data/testprint
+$ journalctl -u cups --no-pager -n 80 | grep -iE 'error|permission|total'
+```
+
+日志里炸出来两行触目惊心的红：
+
+```text
+[Job 4] /usr/lib/cups/filter/brlpdwrapperDCP7057: line 139:
+        /usr/local/Brother/.../cupswrapper/brcupsconfig4: Permission denied
+[Job 4] /usr/lib/cups/filter/brlpdwrapperDCP7057: line 147:
+        /usr/local/Brother/.../lpd/filterDCP7057: Permission denied
+```
+
+CUPS 的过滤器进程根本无法执行洛汐手动解包出来的文件。先看一眼最传统的 Unix 权限——
+
+```bash
+$ ls -l /usr/local/Brother/Printer/DCP7057/lpd/
+-rwxr-xr-x 1 lycecilion lycecilion ... filterDCP7057
+-rwxr-xr-x 1 lycecilion lycecilion ... psconvert2
+-rwxr-xr-x 1 lycecilion lycecilion ... rawtobr3
+```
+
+所有者是 `lycecilion`，因为普通用户解包时无法保留 RPM 里的 `root:root`，随后的 `cp -a` 又如实保留了这个所有者。但是这并不能解释 `Permission denied`：三个文件都是 `755`，其他用户本来就有读取和执行权限。
+
+洛汐还是把系统驱动的所有者改回了包内原本的 `root:root`，但这只是恢复正常的系统文件归属，不是本次拒绝执行的修复。
+
+```bash
+$ sudo chown -R root:root /usr/local/Brother
+```
+
+再打一次。果然还是没动静。
+
+洛汐没有崩溃。洛汐想起了 Fedora 上那个沉默的守护者——SELinux。
+
+```bash
+$ sudo ausearch -m avc -ts recent | grep -E 'brcupsconfig|filterDCP'
+```
+
+审计日志立刻吐出了答案：
+
+```text
+type=AVC msg=audit(...): avc: denied { execute } for
+  pid=81797 comm="brlpdwrapperDCP" name="brcupsconfig4"
+  scontext=system_u:system_r:cupsd_t:s0-s0:c0.c1023
+  tcontext=unconfined_u:object_r:user_tmp_t:s0
+  tclass=file permissive=0
+```
+
+答案终于出现了。这些文件在 `/tmp/brother_extract` 里解包时获得了临时文件的 `user_tmp_t` 标签；而 `cp -a` 不只保留了所有者和模式位，也尝试保留扩展属性与 SELinux 上下文。于是文件虽然已经身在 `/usr/local/Brother/`，身上却还带着 `user_tmp_t`。CUPS 过滤器所在的 `cupsd_t` 域不允许执行这种类型的文件。
+
+```bash
+$ ls -laZ /usr/local/Brother/Printer/DCP7057/lpd/rawtobr3
+unconfined_u:object_r:user_tmp_t:s0
+```
+
+洛汐有点想笑。SELinux 的 context 就像护照：普通复制通常会按新位置领一本新护照，`cp -a` 却尽力把旧护照也原封不动地带了过来。文件搬到了系统目录，海关看到的却仍然是一份“用户临时文件”证件。
+
+```bash
+$ sudo semanage fcontext -a -t bin_t "/usr/local/Brother/Printer/DCP7057/lpd(/.*)?"
+$ sudo semanage fcontext -a -t bin_t "/usr/local/Brother/Printer/DCP7057/cupswrapper(/.*)?"
+
+$ sudo restorecon -RFv /usr/local/Brother/
+Relabeled /usr/local/Brother from unconfined_u:object_r:user_tmp_t:s0 to system_u:object_r:usr_t:s0
+Relabeled /usr/local/Brother/Printer/DCP7057/lpd/filterDCP7057 ... to system_u:object_r:bin_t:s0
+Relabeled /usr/local/Brother/Printer/DCP7057/lpd/rawtobr3 ... to system_u:object_r:bin_t:s0
+Relabeled /usr/local/Brother/Printer/DCP7057/cupswrapper/brcupsconfig4 ... to system_u:object_r:bin_t:s0
+Relabeled /usr/local/Brother/Printer/DCP7057/inf/brDCP7057rc ... to system_u:object_r:cupsd_rw_etc_t:s0
+Relabeled /usr/local/Brother/Printer/DCP7057/inf/paperinf ... to system_u:object_r:cupsd_rw_etc_t:s0
+```
+
+`semanage fcontext` 为这台打印机的可执行目录建立了持久规则；Fedora 自带的 SELinux policy 已经知道 `/usr/local/Brother/.../inf/` 应该是 `cupsd_rw_etc_t`。`restorecon` 再根据路径把真正的标签刷回去：程序是 `bin_t`，需要由 CUPS 读写的配置是 `cupsd_rw_etc_t`。这一次，所有文件的护照才真的换好了。
+
+再查 AVC 审计日志——零条新拒绝。SELinux 终于松开了拳头。洛汐这才再走一次 `lpr`：
+
+```bash
+$ lpr -P DCP7057 /usr/share/cups/data/testprint
+$ journalctl -u cups --no-pager | grep -E 'Sent [0-9]+ bytes|total [0-9]'
+[Job 8] Sent 103788 bytes...
+DCP7057 lycecilion 8 [19/Jul/2026:10:35:23 +0800] total 0 - localhost testprint - -
+```
+
+这一次不再是 `Sent 0 bytes`，USB 后端确认发出了 103788 字节。房间里终于响起了那声熟悉的嗡鸣。
+
+打印机活了！
+
+小水母从椅子上弹起来，差点撞到书架。那张打出来的测试页上，Linux 的小企鹅和灰度图排得整整齐齐。洛汐盯着它看了好几秒——不是因为它有多好看，而是因为它在不久之前还是一个不可能存在的物体。就像沙漠里的旅人突然看见了一汪湖泊，虽然那只是一张打印纸，但它在那一刻比任何 4K 屏幕都要耀眼。
+
+收拾战场时，洛汐一共数出了四张纸。其中三张是正常的 Printer Test Page：一张有小企鹅，一张有圆形与灰度图，还有一张印着 CUPS Logo。它们是这场排障最朴素、也最有说服力的成功记录。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Debugging-a-Silent-Brother-Printer-on-Fedora-44/printer-test-pages.jpg DCP-7057 成功打印的三张测试页：小企鹅、圆形与灰度图，以及 CUPS Logo。 download:true fancybox:true ratio:1920/891 %}
+
+## 四 · total 0 的真相
+
+可日志里仍然有一根小刺没有消失：明明已经发出十万多字节，打印机也的确吐了纸，下一行为什么仍然是 `total 0`？
+
+洛汐一开始把它读成了“总计零字节”。但在 CUPS 的 `page_log` 格式里，`total` 后面跟的从来不是字节数，而是作业已统计到的纸张数。数据量要看 USB 后端的 `Sent ... bytes`，页数则需要过滤器向 CUPS 报告 `PAGE:` 计费信息。这是两套完全不同的账本。
+
+其实 debug 日志早已把原因写在了眼前：
+
+```text
+ppdFilterLoadPPD: Last filter determined by the PPD: brlpdwrapperDCP7057;
+Final data MIME type: application/vnd.cups-postscript
+=> PDF filter will not log pages in page_log.
+```
+
+Brother 这套旧 PPD 过滤链没有把有用的页数统计信息交回 CUPS，因此 CUPS 只能记下 `total 0`。这不代表没有打印，也不代表 `rawtobr3` 绕过了标准管道；它只表示：纸已经打了，但这个老驱动没有把页数记进 CUPS 的账本。
+
+## 彩蛋：掉在地上的假线索
+
+排查过程里还出现过一根很像凶器的火柴：`a2ps`。
+
+`brlpdwrapperDCP7057` 是一个 shell 脚本，在最底层它会调用 `/usr/local/Brother/Printer/DCP7057/lpd/filterDCP7057`，后者再调用 `rawtobr3`（32 位 ELF）把 PostScript 转换成 Brother 打印机的 PJL 命令流。
+
+在这个 filter 脚本里，有一段对输入文件类型的判断：
+
+```bash
+FILE_TYPE=`file $INPUT_TEMP1 | sed -e 's/^.*:[ ]*//' -e 's/[ ].*//'`
+```
+
+这个低层脚本会区分 PostScript、PDF 和其他输入；遇到普通文本时，它确实依赖 `a2ps` 先把文本转成 PostScript。而洛汐一直在打的测试页，用 `file` 看起来偏偏又是 ASCII 文本：
+
+```bash
+$ file /usr/share/cups/data/testprint
+/usr/share/cups/data/testprint: ASCII text
+```
+
+{% note color:yellow 说明 它看起来是文本，却不是普通文本。CUPS 的 `testprint` 内容是 `#PDF-BANNER` 与 `Template default-testpage.pdf`：它是一份测试页描述文件。%}
+
+正是这里最容易误导人。CUPS 并不会把这份 ASCII 描述原样塞给 Brother 驱动。真实日志列出了完整过滤链：
+
+```text
+bannertopdf          application/vnd.cups-pdf-banner → application/pdf
+pdftopdf             application/pdf → application/vnd.cups-pdf
+pdftops              application/vnd.cups-pdf → application/vnd.cups-postscript
+brlpdwrapperDCP7057  application/vnd.cups-postscript → printer/DCP7057
+```
+
+到达 `filterDCP7057` 时，输入早已是 PostScript，因此 CUPS 这条路径完全不会走 `a2ps` 分支。包管理器记录也给出了另一份时间证言：`a2ps` 在 10:30:02 就已经安装，而 10:33 之后的作业仍然因 SELinux 拒绝而发出零字节。它不可能是最后修好打印的那根火柴。
+
+不过，安装它仍然有价值：如果绕过 CUPS 前端，直接向 `filterDCP7057` 喂普通文本，这个低层脚本确实需要 `a2ps`。它是一个值得补齐的隐式依赖，只是不是这起案子的凶手。
+
+第四张纸恰好证明了这两条路径的差别。手动绕过 CUPS 的 `bannertopdf` 过滤器，把 `/usr/share/cups/data/testprint` 直接喂给 `filterDCP7057` 时，它只看见了一份 ASCII 文本，于是经 `a2ps` 原样印出了这些内容：
+
+```text
+<</.HWMargins[17. 12. 17. 12.]>>setpagedevice
+#PDF-BANNER
+Template default-testpage.pdf
+...
+```
+
+它不是另一种 CUPS 测试页，而是本应由 CUPS 解释的测试页描述，在绕过前置过滤链后被当成了普通文字。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Debugging-a-Silent-Brother-Printer-on-Fedora-44/literal-pdf-banner-test-page.jpg 绕过 CUPS 前置过滤链后，`testprint` 的描述内容被当成普通文本直接打印。 download:true fancybox:true ratio:1920/891 %}
+
+补起来倒是异常简单：
+
+```bash
+$ sudo dnf install -y a2ps
+Installing:
+ a2ps     x86_64  4.15.8-3.fc44     fedora   3.6 MiB
+ # 还有五十多个 Perl 依赖，洛汐的 Fedora 星舰在一阵短暂的包风暴后安静下来
+Complete!
+```
+
+最后，洛汐把 CUPS 日志级别恢复成 `warn`，重启服务：
+
+```bash
+$ sudo sed -i 's/^LogLevel .*/LogLevel warn/' /etc/cups/cupsd.conf
+$ sudo systemctl restart cups
+```
+
+CUPS 已经弃用这类第三方 PPD/filter 驱动接口；未来的方向是 driverless IPP，而不能直接提供 IPP 的旧设备则需要 Printer Application 之类的兼容层。洛汐心想，在那一天真正到来之前，有一个 `total 0` 的小幽灵住在日志里也挺好——它会在 CUPS 每次汇报 `total 0` 的时候提醒洛汐：有些东西可以被统计，但有些东西统计不出来；有些 bug 可以被修好，但有些 bug 只是被温柔地放在那里，和系统平安共处。
+
+## 小水母和会说话的打印机
+
+洛汐靠在椅背上，看着那台 Brother DCP-7057 安静地呆在桌子一角。不久之前它还是一个沉默的黑盒子，现在它活了——会嗡鸣、会吐纸、会在托盘里叠起一叠带着定影器余温的白纸。
+
+小水母回想这一路：有 rpm 校验失败被老安装器草草掠过，有被 `cp -a` 从临时目录带进系统的 SELinux 旧护照，还有那根看起来很像凶器、最后却被证明只是假线索的 `a2ps`。可一层一层拆开来看——每一层都是可以理解的、有诊断路径的、能用人话解释的。
+
+洛汐忽然觉得，调试打印机和写诗之间有一种奇怪的相似性：都是一行一行地改，改到某一刻它忽然对了，你终于能从留下的每一行痕迹里，说清它为什么曾经是错的。打印机在响的那一刻，带来的喜悦的确不亚于自己敲出的代码跑了起来——或者说，代码不会发出声音；而打印机却可以，它发出来的声音，不知为何如此悦耳动听。
+
+以后的洛汐还会装很多软件、配很多环境、遇到很多不知道从哪冒出来的错误日志。但至少在今天——在 2026 年 7 月 19 日的这个上午——洛汐知道了一件事：打印机从来不是沉默的。它只是在等人说出那句正确的咒语。
+
+晚安，DCP-7057。晚安，被驯服的蝴蝶残影。晚安，小水母和 ta 的打印机。

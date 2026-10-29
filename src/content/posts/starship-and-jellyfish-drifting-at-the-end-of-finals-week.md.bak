@@ -1,0 +1,1531 @@
+---
+title: 星舰和水母，在期末周终末之时漂流。
+date: 2026-07-06 00:00:00
+tags:
+- Linux
+- Fedora
+- Windows
+- Nix
+- Zsh
+- Flatpak
+- KVM
+- fontconfig
+- Wayland
+- debugging
+- Java
+categories:
+- Linux
+description: 小水母零音带好 Windows 的全部家当，在流转银河中漂流到了名为 Fedora 的星舰。
+cover: https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/5120x2880.png
+banner:
+  headline: 星舰和水母，在期末周终末之时漂流。
+  tagline: Per aspera, ad astra.
+article:
+  style: tech
+  author: lycecilion
+  ai_label: generated
+render:
+  math: false
+---
+
+<!--markdownlint-disable MD033 MD034-->
+
+## 在一切开始之前
+
+零音，2026 年 3 月 6 日，于 QQ 空间。
+
+{% blockquote %}
+
+透明的小水母是突然决定要走的。它的身体本是澄澈的蓝色，最近却总咕噜冒着灰色的气泡。小水母本是不在意的——直到压力像海绵一样吸走了它最后的一点快乐。小水母觉得自己喘不过气来了。
+
+透明的小水母是突然决定要走的。于是它把发烫的笔记本电脑和四门课的练习册塞在书包里，触手湿漉漉地垂在书包袋子上。西电南校区的风是干燥的，吹得小水母的皮肤皱皱的。它突然决定要走，或许能透透气呢。
+
+透明的小水母是突然决定要走的。小水母扫了一辆共享单车，顺便打开乐跑，便朝着远方骑了一个小时。直到小水母累到蹬不动踏板了，却发现自己还在造字台站，仍在六号线的蓝色线条里。小水母吐了个泡泡，有点失落地想：水母可真笨啊，累到触手都快断了，仍没有逃过六号线的引力圈呢。于是它把车停在地铁口，跟着人群向地下走。
+
+透明的小水母是突然决定要走的。那是小水母第一次意识到周五的晚高峰，进站的队伍像一条长长的海带，中间隔着限流的铁栏杆。队伍停滞在原地不前，小水母于是开始发呆：它想起自己的 CTF 比赛、想起自己以后要成为很厉害的网安研究员、想那个二进制的世界是否比这里要湿润一点。直到队伍向前移动惊醒了小水母，小水母慌忙地将书包放在安检仪上，下了楼梯，听地铁轰隆隆地来、轰隆隆地停，轰隆隆地走。
+
+透明的小水母是突然决定要走的。小水母贴在扶手上，不知道自己要去哪里，但大抵也不会担心了。看着窗外漆黑的隧道，小水母想，这里虽然没有水，但有电；有电的地方，水母也能发光。西安地铁是一个大的海洋，但海洋一定也会有终点吧。小水母于是这么想着，便开心了些许。毕竟，它的背包里还装着没有提交的 Flag 呢。
+
+{% endblockquote %}
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/FE9A53E1D40925F346E06882E4A3B9DD.jpg 零音在「造字台」站地铁口，C 口，熙熙攘攘的人群正在出站。由 HUAWEI Mate 60 Pro+ 拍摄。 download:true fancybox:true ratio:1379/640 %}
+
+一切本不是终焉——至少在零音打下这么长一段字之后的有限时间里，零音便已然知晓，这一切的痛苦和绝望从未、亦从不会迎来终结。
+
+在期末周开始之前，零音就如此想过了——想要再装一次 Fedora。
+
+一方面是又手痒痒了，想要再尝鲜一次 Linux 世界的美好；另一方面是的确被 Windows 吓哭了。大概是五月吧，连着跪了三场 CTF/取证 比赛了。有一场比赛零音在 WSL2 开着 Codex 跑 Python 探路，结果 I/O 负载愣是给 WSL2 干爆了，自那之后零音就对 Microsoft 不怀什么信任了。WSL2 在日常使用中的问题也很多，最大的问题就是经常莫名其妙掉网卡——有些时候一打开网就断了，干什么都提示 Name resolution 有问题——`ip addr` 一看，竟然只剩下一个 `loop`。没找到任何修的好办法。`mirror` 也没法成功镜像；Codex 莫名其妙就会干碎 WSL2。
+
+这个想法，零音想了很久了。可惜后来因为需要写物理实验报告，需要在 Windows 上使用 Microsoft 365，零音只好一拖再拖了。一直拖到了期末周，到了期末周结束的周末，零音一口气重装了整个计算机。期末周是很累的，零音上大学之前从来没想到过期末周的强度这么大，两周内愣是学了一整个学期的数电、大物、高数和线代。这太痛苦了。零音这两周几乎没怎么睡过好觉，饮食也是不规律到了极点，每天活得生不如死。幸好西电的期末周只有两周。小水母终于得救了。结束后的小水母去了魏家凉皮，点了一大碗麻辣米线和一个肉夹馍。从来没有如此幸福过。
+
+也有人向零音推荐过 macOS 之类，但零音总觉得不对胃口。Apple 自从引入了 Liquid Glass 之后，零音就已经下巴掉下来 ~~上巴飞上去~~ 了。零音对 Liquid Glass 没有一点点欣赏的感觉，因此也对新款的 MacBook 有些祛魅——虽然更多是因为的确没钱买 MacBook。总而言之呢，这样的迁移计划，零音一点点盘算着。在期末周结束的周末，零音终于有机会动工了。（9 月 7 日二更：体验了一把 MacBook Pro。洛汐必须收回这一段话了，macOS 是真心不错的优雅系统。（
+
+## 零 · 启程前的准备
+
+零音已经有了相对有些数目的项目，无论是个人的项目还是学校的项目，并且也配置了自己的 OSS、服务器之类，因此不能再像往日那样鲁莽地直接抹盘重装了。这一次零音相对做了一些准备。在抹盘之前，零音使用 Windows 和 WSL2。在 Windows 侧，零音通常习惯用 `scoop` 和 `winget` 来管理软件包；如果这两个平台都没有，零音也宁愿选择便携版，并放在统一的目录下管理，以保持各个软件之间不会 ~~貂蝉在一起了~~。零音统计了 `scoop` 上的软件包：
+
+{% folding `scoop` 侧的软件包 %}
+
+```text
+010editor 16.0.4
+7zip 26.01
+adb 37.0.0
+anythingllm 1.13.0
+aria2 1.37.0-1
+bat 0.26.1
+beebeep 5.8.6
+blender 5.1.2
+btop 1.0.5
+calibre 9.9.0
+clangd 22.1.0
+cmake 4.3.3
+codex 0.135.0
+dark 3.14.1
+diskgenius 6.2.0.1821
+dust 1.2.4
+everything-alpha 1.5.0.1409a
+fastfetch 2.63.1
+fd 10.4.2
+ffmpeg 8.1.1
+fzf 0.73.1
+g-helper 0.250
+gcc 15.2.0
+geekuninstaller 1.5.3.170
+ghidra 12.1-20260513
+git 2.54.0
+git-lfs 3.7.1
+go 1.26.3
+gpg4win 5.0.2
+hashmyfiles 2.50
+ilspy 10.1.0.8386
+innounp 2.67.9
+insideclipboard 1.30
+iperf3 3.21
+jadx 1.5.5
+less 702
+llvm 22.1.6
+localsend 1.17.0
+miktex 25.12
+mp3tag 3.34.1
+neovim 0.12.2
+networkminer 3.1
+ninja 1.13.2
+nmap 7.99
+nodejs24 24.16.0
+obs-studio 32.1.2
+obsidian 1.12.7
+onecommander 3.108.0.0
+opencode 1.15.12
+openjdk 26-35
+pandoc 3.9.0.2
+pe-bear 0.7.1
+perl 5.42.2.1
+postgresql 18.4
+potplayer 260401
+pympress 1.8.6
+python 3.14.5
+qbittorrent-enhanced 5.1.3.10
+rclone 1.74.2
+resource-hacker 5.2.8
+resvg 0.47.0
+ripgrep 15.1.0
+rustup 1.29.0
+scrcpy 4.0
+sharex 20.2.0
+sox 14.4.2
+sqlitestudio 3.4.21
+sublime-text 4-4200
+sysinternals 20260507
+tealdeer 1.8.1
+temurin17-jdk 17.0.19-10
+temurin21-jdk 21.0.11-10.0
+temurin8-jdk 8.0.492-9
+thunderbird 151.0.1
+typora 1.13.6
+typst 0.14.2
+upscayl 2.15.0
+upx 5.1.1
+uv 0.11.17
+vcredist2010 10.0.40219.325
+vlc 3.0.23
+vncviewer 7.15.1
+vscode 1.121.0
+wabt 1.0.41
+wireshark 4.6.6
+wiztree 4.31
+xh 0.25.3
+youtube-dl 2021.12.17
+zeal 0.8.1
+zed 1.4.4
+zen-browser 1.20.1b
+zig 0.16.0
+zoxide 0.9.9
+zulufx8-jdk 8.94.0.17
+```
+
+{% endfolding %}
+
+除去 `scoop` 外，有直接安装的程序
+
+{% folding 直接安装的程序 %}
+
+```text
+Adobe After Effects 2025, Audition 2025, Photoshop 2026
+Advanced Archive Password Recovery
+JetBrains ToolBox (with Android Studio, IntelliJ IDEA, PyCharm, Rider)
+Binary Ninja
+Bitwarden
+DCP-7057 Driver
+CC Switch
+Cherry Studio
+Clash Party
+DaVinci Resolve
+DB Browser for SQLite
+Docker Desktop
+Figma
+Firefox Develop Edition
+Google Chrome
+Gpg4win
+IrfanView
+KDE Connect
+LM Studio
+Microsoft 365 (with MathType, OfficePLUS)
+Oh My Posh
+Orca
+pgAdmin
+PicGo
+qBittorrentEE
+QQ
+Realm Studio
+RX-SSTV
+Samsung Magician
+Sandboxie-Plus
+SciDAVis
+SilentEye
+Steam
+TranslucentTB
+UFS Explorer Professional Recovery
+VeraCrypt
+VMware Workstation
+WD Discovery
+Wolfram 14.3
+滴答清单
+钉钉
+飞书
+火绒安全软件
+钱迹
+天选姬
+网易云音乐
+微信
+微信输入法
+鹰角启动器 (with 明日方舟：终末地)
+```
+
+{% endfolding %}
+
+除去这些外，还有零音私藏的一些小工具。在 `D:\CTF\tools` 中：
+
+```text
+.
+├── binary
+│   ├── DetectItEasy
+│   ├── IDA_Professional
+│   ├── Il2CppDumper
+│   ├── jadx-ai-mcp
+│   ├── Magicmida
+│   ├── Scylla
+│   ├── ScyllaHide
+│   ├── x96dbg
+│   └── ysoserial
+├── crypto
+│   └── bip39-standalone
+├── forensics
+│   ├── aLEAPP
+│   ├── CFF_Explorer
+│   ├── f-droid-app-recog
+│   ├── FTK_Imager
+│   ├── iLEAPP
+│   ├── MemProcFS
+│   ├── MFTBrowser
+│   ├── WinHex
+│   └── 'X-Ways Forensics'
+├── misc
+│   ├── CRC32-Tools
+│   ├── Deformed-Image-Restorer
+│   ├── FileReverse-Tools
+│   ├── iText_RUPS
+│   ├── LovelyMem
+│   ├── MP3Stego
+│   ├── png_wh_crack
+│   ├── StegHide
+│   ├── StegSolve
+│   └── ZipCenOp
+├── reverse
+│   └── GDRE_tools
+├── universal
+│   └── regadgets
+└── web
+    ├── AntSword
+    ├── Burp_Suite
+    ├── d_safe
+    ├── 'Nav Premium 17'
+    ├── shiro_attack
+    ├── socat-1.8.0.1
+    └── YuJian
+```
+
+在 `D:\PortableApps` 中：
+
+```text
+.
+├── ClassIsland
+├── ContextMenuManager
+├── Logisim-ITA.jar
+├── MixTex
+├── Nano
+├── noMeiryoUI
+├── Umi-OCR_Paddle_v2.1.5
+├── v2rayN-windows-64
+├── WinMTR
+└── Xplist-Win64
+```
+
+这些是零音在 Windows 侧的全部家当。
+
+而在 Linux 侧，零音使用了 Ubuntu 和 Determinate Nix，并惯用 `home-manager`。在迁移之前，零音的 `home-manager` 配置文件中有软件包：
+
+| 组                | 包                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **essentials**    | `bat`, `btop`, `eza`, `fd`, `ripgrep`, `tealdeer`, `xh`, `zoxide`                                                                                                                                                                                                                                                              |
+| **utilities**     | `bubblewrap`, `charm-freeze`, `codex`, `distrobox`, `devbox`, `fastfetch`, `file`, `sqlite`, `unzip`, `uv`, `wineWow64Packages.stable`, `winetricks`, `xz`, `zstd`                                                                                                                                                             |
+| **archives**      | `fcrackzip`, `john`, `p7zip-rar`                                                                                                                                                                                                                                                                                               |
+| **filesystems**   | `exfatprogs`, `fuse`, `fuse3`, `libewf`, `ntfs3g`, `sleuthkit`, `testdisk`, `util-linux`                                                                                                                                                                                                                                       |
+| **forensicsTool** | `afflib`, `btrfs-progs`, `bulk_extractor`, `cabextract`, `libguestfs`, `lvm2`, `qemu-utils`, `regripper`, `tree`, `unrar`, `xfsprogs`                                                                                                                                                                                          |
+| **media**         | `exiftool`, `ffmpeg`, `imagemagick`, `poppler-utils`, `rclone`, `resvg`, `sox`, `steghide`, `tesseract`, `zbar`, `zsteg`                                                                                                                                                                                                       |
+| **debugging**     | `gdb`, `ghidra`, `pwndbg`, `python3` (with `ipython`, `pefile`, `pwntools`, `requests`, `pycryptodome`, `z3-solver`)                                                                                                                                                                                                           |
+| **ctfOps**        | `audit`, `binutils`, `binwalk`, `elfutils`, `foremost`, `jadx`, `jq`, `ltrace`, `netcat-openbsd`, `nmap`, `patchelf`, `pwninit`, `radare2`, `rr`, `rizin` + `rz-ghidra`, `socat`, `strace`, `tcpdump`, `tshark`, `tmux`, `upx`, `yq-go`                                                                                        |
+| **webCtf**        | `ffuf`, `gobuster`, `sqlmap`                                                                                                                                                                                                                                                                                                   |
+| **dev**           | `autoconf`, `clang-tools`, `cmake`, `gcc`, `git-lfs`, `libseccomp`, `maven`, `ninja`, `temurin-bin-21`, `nodejs_22`, `php` (with extensions) + `composer`, `pnpm`, `bun`, `eslint`, `prettier`, `typst`, `typescript-language-server`, `pkg-config`, `poetry`, `pyright`, `ruby`, `ruff`, `just`, `watchexec`, `rustup`, `zig` |
+
+同时零音也使用了 `apt` 安装了部分软件包。
+
+```text
+apktool
+bc
+binutils
+bison
+build-essential
+cc-switch
+ceph-base / ceph-common / ceph-osd
+ewf-tools
+flex
+fonts-noto-cjk / fonts-noto-cjk-extra
+lvm2
+mdadm
+ntfs-3g
+qemu-system-x86
+rocksdb-tools
+sqlcipher
+xmount
+```
+
+另有大量通过 `apt` 自动拉入的依赖（`git`, `curl`, `tmux`, `python3`, `neovim` 等均在此列），不逐一列举。
+
+在于银河漂流之前……零音认为，必须先认清楚自己的定位。每个灵魂对计算机和系统的使用目的、习惯和要求都各不相同，因此只有知道自己到底要干什么，才能配出自己喜欢的系统。于零音而言，零音会做跨平台全栈开发，将进行剪辑和平面设计，做文档工作，玩音游和《终末地》等。事实上，零音的这套工作流和 Linux 并不总是着调，或者说属于天崩开局——毕竟，零音已惯用 Adobe AE 和 PR 进行剪辑，可 Linux 侧并没有 Adobe 的支持；而设计似乎又不总是能和 Linux 联想到一起。不过思考过后，零音最终决然切换到 DaVinci。切换操作系统确意味着这样的痛楚，必须割舍些什么，才能换回来什么。在有 alternative 的时候，这样的割舍是相对容易的；可真正到了包括但不限于 Microsoft 365 这种几乎无法有平替（当然不包括 WPS）的场景，确实就有些困难了。
+
+不过，除非真正到了 Fedora 世界，否则我们很难摸清楚到底哪些软件包是我们真正所需要的、哪些需要特殊配置、哪些又会出问题。零音在这里只顾大胆地走了——到了新世界，再看看新世界的模样。
+
+启程前的最后准备是备份 GPG 密钥。说来惭愧，零音无数次想要制作一块超级 U 盘——既可以用 Ventoy，带上各种操作系统和内容的 ISO；又可以存储个人文件和加密密钥。只可惜一直拖到了现在，却也没能完成。GPG 密钥本应不在零音的 Windows 上的。不过临走前，还是备份一下的好。做完这一切后，我们就可以启程了——
+
+## 一 · 推离 Windows 旧港
+
+零音的这台华硕天选 6 Pro——唔，之前应该叫 `stellark`；现在在 Fedora 上，应该叫 `stellarkira` 了——之前一直安装的是 Windows。零音是绝对的强迫症——自从换上了新的电脑后，越来越喜欢 ASUS 的原厂系统，而非 Microsoft 的干净 Windows 了——毕竟自带驱动和 MyASUS 之类足够方便，WinRE 也可以直接使用 MyASUS for WinRE，最重要的——零音再没有任何自己配 Windows 的动力了。零音喜欢事物最原初的模样——所以在离开已有的 Windows 之前，零音将 Windows 回滚到了原厂的状态。
+
+许多近年的 华硕 / ASUS 笔记本电脑会提供 华硕云端还原 或类似的出厂恢复功能，但具体入口、可恢复范围和是否保留数据取决于机型、固件版本和恢复环境。以零音这台机器的现象来看，WinRE 和 UEFI 固件里都能发起 Windows 恢复；WinRE 路径更像是在已有恢复环境中重置 Windows 分区，而 UEFI 固件路径会联网拉取恢复环境，并且可能重写磁盘布局。因此，不管使用哪一种，都应当按「目标磁盘会被清空」来提前备份数据。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/0999D8F80225A6E82E940C80B0CA2F81.jpg 零音使用 UEFI 固件提供的重置能力干净安装了 Windows。 download:true fancybox:true ratio:1920/1440 %}
+
+{% note color:yellow 两种还原方式的区别
+
+这部分内容是零音根据已有现象推测的，零音并不能保证是否完全准确。<br/>
+
+零音此次尝试了 WinRE 还原和 UEFI 固件还原。WinRE 的还原非常快速，看起来仅进行了一个单独的还原过程；还原之后的系统只有 Windows 分区被重置，因此零音推测它更接近于将恢复分区中的镜像还原到 Windows 分区。而 UEFI 固件的还原，首先由 UEFI 联网下载了一个类 WinRE 的预备环境，在该环境中先安装了一个干净的 Windows，随后由一个自动化的工具对该干净 Windows 进行各种驱动和软件的配置，最后 SysPrep。不过零音需要说明：这部分只是基于本机现象的推断，不应当当成 ASUS 所有机型的通用机制——除非零音真的猜对了。
+
+%}
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/5651648CCCDDEEC89F667DF2C9BA772D.jpg 零音完成了 Windows 的重置，在 OOBE 界面。 download:true fancybox:true ratio:1920/1440 %}
+
+<!-- ai continuation starts here -->
+
+不过，因为零音的电脑上有 2 块 SSD，华硕云端还原 将 500G 的 SSD 给了 Windows，那刚好，1 TB 的硬盘就留给 Fedora 了。装完 `stellarkira` 的 Windows 后，卸载掉自带的 McAfee、关闭「快速启动」和「休眠」、设置 UTC 时间后，零音就置之不顾啦。下面便是——Fedora，启动！
+
+## 二 · 驶入 Fedora 新船
+
+零音从 Fedora Live USB 启动后，选择了 Manual disk configuration——自动分区虽然省事，但零音对磁盘布局有些自己的想法。规划如下：
+
+```text
+nvme1n1
+|-nvme1n1p1 vfat   FAT32 FEDORA_EFI
+|-nvme1n1p2 ext4   1.0   FEDORA_BOOT
+|-nvme1n1p3 swap   40G   FEDORA_SWAP
+`-nvme1n1p4 btrfs        FEDORA
+```
+
+EFI 分区放最前面，`/boot` 用稳定的 ext4，swap 单独划分——零音的笔记本装了 32G 内存，为了休眠给了 40G swap，避免内存占用较高时休眠镜像写不下。根分区用了 Btrfs——这是 Fedora 的默认选择，支持快照、子卷、透明压缩，对零音这种喜欢折腾的人来说是个好玩的文件系统。
+
+为 `p1`、`p2`、`p4` 三个分区都勾选了 Reformat。然后点下「Begin Installation」——然后安安静静地等了五分钟，安装器在 Finalization 阶段突然弹窗：
+
+```text
+Installation failed
+org.fedoraproject.Anaconda.Modules.Storage.UnsupportedPartitioningError
+```
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/A4ED045DB28836B5C9FCDC2B393E2A1B.jpg Fedora 安装器报告安装错误。 download:true fancybox:true ratio:1920/890 %}
+
+找不到 btrfs 设备。零音愣了一下，盯着弹窗看了几秒钟。小水母的第不知道多少次被 Linux 安装器打脸经历——但这次零音很快有了一个怀疑：安装器在 Reformat 阶段重新格式化了 `p4`，导致 Btrfs 的 UUID 或者设备对象在 Anaconda 的内部状态和实际磁盘之间产生了不一致。Reformat 之后，Anaconda 还在按旧的设备引用去找 Btrfs，于是就找不到了。这是对当时现象的判断，零音没有进一步读 Anaconda 日志证明根因。
+
+解决办法很简单：不在安装器里 Reformat——先手动格式化，再让安装器直接挂载。
+
+零音切到 Live CD 的 Konsole。Fedora KDE 的 Live 环境附带了完整的终端和磁盘工具，这点零音一直很感激——当图形安装器翻车的时候，你不会被困在某个没有工具的环境里。
+
+```bash
+lsblk -o NAME,SIZE,FSTYPE,LABEL,PARTTYPENAME,PARTFLAGS,MOUNTPOINTS
+```
+
+确认了目标磁盘是 `nvme1n1` 之后，手动格式化了所有分区：
+
+```bash
+sudo swapoff /dev/nvme1n1p3 2>/dev/null
+sudo mkfs.fat -F32 -n FEDORA_EFI /dev/nvme1n1p1
+sudo parted /dev/nvme1n1 set 1 esp on
+sudo parted /dev/nvme1n1 set 1 boot on
+
+sudo mkfs.ext4 -F -L FEDORA_BOOT /dev/nvme1n1p2
+sudo mkswap -f -L FEDORA_SWAP /dev/nvme1n1p3
+sudo mkfs.btrfs -f -L FEDORA /dev/nvme1n1p4
+```
+
+在运行 `parted` 设置 ESP 和 boot 标志时，终端吐了一条：
+
+```text
+Information: You may need to update /etc/fstab.
+```
+
+这个是正常的——Live CD 的 `/etc/fstab` 是临时环境的，安装器会在目标系统里重新生成。零音没管它，回到安装器，在分区界面取消所有 Reformat 勾选，只指定挂载点——`p1` 挂 `/boot/efi`，`p2` 挂 `/boot`，`p4` 挂 `/`——这次安装顺畅地走完了。
+
+小水母看着进度条走到 100%，在「Complete!」弹出的那一刻轻轻地、长长地呼了一个泡泡。Fedora 星舰的第一块龙骨，正式落成了。
+
+重启。GRUB 菜单闪过，KDE Plasma 的欢迎屏幕亮起来。零音做的第一件事是打开 Konsole，更新系统——新装的系统总要先把所有包拉到最新，让星舰以最佳状态启航。
+
+```bash
+sudo dnf upgrade --refresh
+systemctl reboot
+```
+
+第二件事：输入法。没有输入法，零音在 Fedora 上连「零音」都打不出来——某种意义上，输入法是中文用户在 Linux 世界的第一扇门。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/7DE9483A6282BD86F4F51286C794F220.jpg J2rQ(y) 和零音的聊天记录。零音没能成功安装输入法。 download:true fancybox:true ratio:1260/1089 %}
+
+```bash
+sudo dnf install fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk \
+  fcitx5-chinese-addons fcitx5-rime
+```
+
+`fcitx5` 是输入法框架本身；`fcitx5-configtool` 提供图形配置界面；`fcitx5-qt` 和 `fcitx5-gtk` 分别是 Qt 和 GTK 的输入法模块——让输入法能在不同工具集的程序里正常工作；`fcitx5-chinese-addons` 提供拼音等中文输入方案；`fcitx5-rime` 则是 Rime 输入法引擎的 Fcitx5 前端——零音用的是雾凇拼音，它运行在 Rime 引擎之上。
+
+装好之后，配置环境变量让系统和应用知道该找哪个输入法：
+
+```bash
+mkdir -p ~/.config/environment.d
+```
+
+```text
+# ~/.config/environment.d/fcitx5.conf
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+INPUT_METHOD=fcitx
+SDL_IM_MODULE=fcitx
+```
+
+这几行环境变量各有各的管辖范围：`GTK_IM_MODULE` 管 GTK 程序（比如 GIMP、Inkscape），`QT_IM_MODULE` 管 Qt 程序（KDE 桌面的大多数应用），`XMODIFIERS` 管 XWayland 下的老应用，`SDL_IM_MODULE` 管 SDL 程序——虽然少但偶尔会碰到。全部指到 `fcitx`，统一路线。
+
+设置自启动——确保每次登录 Fcitx5 自动在后台跑起来：
+
+```bash
+mkdir -p ~/.config/autostart
+cp /usr/share/applications/org.fcitx.Fcitx5.desktop ~/.config/autostart/
+```
+
+最后是雾凇拼音本身。零音从雾凇拼音的 GitHub Release 下载了最新压缩包，把里面的所有文件原样复制到 Rime 的用户配置目录 `~/.local/share/fcitx5/rime/` 中——包括 schema 定义、词库、Lua 脚本、以及那个关键的 `corrector.lua`。右键 Fcitx5 托盘图标，点「重新部署」——候选窗弹出来，雾凇拼音的蓝色图标在系统托盘里亮着。零音打了第一行中文：「零音」。它出来了。
+
+然后是休眠。笔记本电脑的休眠对零音来说不是可选项——Fedora 安装器已经配置好了 swap 分区，所以只需要告诉内核 resume 设备的位置：
+
+```bash
+sudo grubby --update-kernel=ALL --args="resume=UUID=<你的-swap-UUID>"
+cat /proc/cmdline
+```
+
+然后加 dracut 的 resume 模块，让 initramfs 在启动早期就能从 swap 恢复内存：
+
+```bash
+echo 'add_dracutmodules+=" resume "' | sudo tee /etc/dracut.conf.d/resume.conf
+sudo dracut -f --regenerate-all
+```
+
+这里有一个坑：在 Fedora 这种启用 Secure Boot 后会进入 kernel lockdown 的发行版配置里，休眠通常会被禁用。原因是休眠镜像写在 swap 里，恢复时内核需要重新装入这份内存镜像；如果没有额外的镜像签名与验证机制，Secure Boot / lockdown 无法信任这份镜像没有被篡改。零音重启进了 UEFI 固件设置，关掉了 Secure Boot。回来之后，KDE 的电源菜单里就出现了「Hibernate」选项。
+
+小水母设了一个五分钟的测试闹钟。合盖。五分钟后开盖——电源键亮起，KDE 锁屏画面恢复，之前打开的 Konsole 和 Firefox 标签页一个不少。休眠成功。零音觉得这五分钟的等待比整个期末周的任何一场考试都值得。
+
+接下来是 Nix。零音是 Determinate Nix 的信徒——它自带 flakes 支持、预配置的 binary cache、以及比上游更好的安装体验。但 Fedora 的根分区是 Btrfs，零音不想让 `/nix` 混在根子卷里——Nix 的 store 会产生大量文件和快照，零音希望它在自己的 Btrfs 子卷里独立呼吸。
+
+先拿到 Btrfs 的顶层 UUID：
+
+```bash
+findmnt -no UUID /
+```
+
+然后挂载 Btrfs 的顶层（subvolid=5），创建一个新的子卷：
+
+```bash
+sudo mkdir -p /mnt/btrfs-top
+sudo mount -o subvolid=5 UUID=<Btrfs-UUID> /mnt/btrfs-top
+
+sudo btrfs subvolume create /mnt/btrfs-top/nix
+```
+
+再把这个子卷挂到 `/nix`，开 zstd 透明压缩和 noatime：
+
+```bash
+sudo mkdir -p /nix
+sudo mount -o subvol=nix,compress=zstd:1,noatime UUID=<Btrfs-UUID> /nix
+```
+
+写入 `/etc/fstab` 让它开机自动挂载：
+
+```text
+UUID=<Btrfs-UUID> /nix btrfs subvol=nix,compress=zstd:1,noatime 0 0
+```
+
+零音测试了一下挂载——umount 再 mount，确认 `/nix` 的内容和权限都正常。Nix store 可以通过硬链接去重，Btrfs 也支持硬链接；真正需要关注的是 `/nix` 必须在安装前挂载好，并且之后不要随意改动 store 的挂载选项。至于是否要给某些目录额外关闭 CoW，那属于后续性能和维护取舍，不是安装 Determinate Nix 的前置条件。
+
+```bash
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
+```
+
+安装脚本跑完，`nix --version` 正常输出。Nix 货舱就位。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260702_160000.png nix --version 正常工作。 download:true fancybox:true ratio:718/374 %}
+
+接下来是软件源。Fedora 的默认仓库覆盖面很好，但有些事情它不碰——比如 NVIDIA 专有驱动、多媒体编解码器。零音加了两个社区仓库：
+
+```bash
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
+
+Flathub 是 Flatpak 应用的主要分发平台——很多 GUI 应用（比如后文会提到的 Gear Lever）在 Flathub 上的版本比 Fedora 仓库的更新、权限隔离也更干净。零音对 Flatpak 的态度是「GUI 应用优先 Flatpak，系统工具和 CLI 优先 dnf」——权限沙箱对于不太信任来源的 GUI 应用来说是个好东西。
+
+```bash
+sudo dnf install \
+  https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+```
+
+RPM Fusion 的 free 仓库提供开源但 Fedora 官方不打包的软件（比如某些多媒体库），nonfree 仓库则提供 NVIDIA 驱动这类专有软件。零音一律 `sudo dnf upgrade --refresh` 让所有仓库同步。
+
+AppImage 则用 Gear Lever 管理——这是一个 Flatpak 上的小工具，可以把 AppImage 集成到系统菜单里，而不是让它们散落在 `~/Downloads` 目录下变成无人认领的孤包。
+
+```bash
+flatpak install flathub it.mijorus.gearlever
+```
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260702_160104.png Gear Lever 管理 AppImage。 download:true fancybox:true ratio:938/938 %}
+
+零音又装了一批命令行工具。这是零音在长年累月里攒下来的「锋利的瑞士军刀」集合——每一个都只做一件事，但做得比传统工具好几倍：
+
+```text
+fzf          模糊搜索核心——Ctrl+R 的真正形态
+ripgrep      比 grep 快一个数量级，默认递归、默认 .gitignore 感知
+fd           比 find 好用一百倍，语法直觉、输出带颜色
+bat          带语法高亮和行号的 cat，看代码不再眯眼
+eza          比 ls 好看太多了——颜色、图标、树状显示
+zoxide       比 cd 聪明，用模糊匹配记住你最常去的目录
+starship     跨 shell 的 prompt 引擎，美且快
+atuin        把 shell 历史存到 SQLite，Ctrl+R 搜索秒出结果
+direnv       进入目录自动加载环境变量——和 Nix flakes 是天作之合
+nix-direnv   direnv 的 Nix 集成，无需手动 nix develop
+jq           JSON 处理的事实标准
+yq           YAML/TOML/XML 的 jq——用同一套语法处理不同格式
+delta        Git diff 美化器，侧边栏视图、语法高亮
+lazygit      终端里的 Git GUI——快、好看、不用记命令
+btop         现代资源监控，比 htop 好看太多
+dust         磁盘占用分析——比 du -sh * 快，还能钻进去看子目录
+duf          磁盘空间查看，比 df -h 好看且更易读
+hyperfine    命令行 benchmark——两条命令谁快，跑一下就知道了
+tokei        代码行数统计——快、准确、支持上百种语言
+just         现代 command runner——比 make 更人性化，比 shell 脚本更结构化
+watchexec    文件变化自动执行命令——「保存即运行」
+```
+
+这些工具零音大部分通过 Nix 安装——因为它们在 nixpkgs 里更新很快，而且 Nix 能保证它们和环境里的其他依赖不发生冲突。一些小工具零音也用 `dnf` 装，但整体来说：Nix 管开发工具链和 CLI 工具，dnf 管系统级组件，Flatpak 管 GUI 应用。三条线各安其位。
+
+最后是字体。零音把能从 Fedora 仓库拿到的 Noto 全套都拉了下来：
+
+```bash
+sudo dnf install \
+    langpacks-zh_CN \
+    google-noto-sans-fonts \
+    google-noto-serif-fonts \
+    google-noto-sans-mono-fonts \
+    google-noto-sans-cjk-vf-fonts \
+    google-noto-serif-cjk-vf-fonts \
+    google-noto-color-emoji-fonts \
+    rsms-inter-vf-fonts
+```
+
+`langpacks-zh_CN` 是 Fedora 的中文语言包，它会拉入中文 locale、中文字体元数据、以及一些默认的中文 fallback 配置；Noto Sans/Serif/Mono 三件套覆盖拉丁和通用字符；Noto Sans/Serif CJK VF（Variable Font）覆盖中日韩汉字；Noto Color Emoji 提供彩色 emoji；Inter VF 则是零音个人偏爱的拉丁 UI 字体——它在小字号下可读性很好，经常被用在不走系统 fontconfig 的应用里作为硬编码 fallback。
+
+但零音还需要更纱黑体——Sarasa Gothic。它是 Iosevka 和 Noto Sans CJK 的缝合体：拉丁部分继承了 Iosevka 的窄等宽风格，汉字部分继承了 Noto 的优雅。在等宽场景（终端、代码编辑器）下，Sarasa 几乎是零音的唯一选择。它不在 Fedora 仓库和 RPM Fusion 里，所以走 home-manager：
+
+```nix
+home.packages = with pkgs; [
+    ...
+    sarasa-gothic
+    ...
+]
+```
+
+字体文件都到齐了。但仅仅是安装字体还不够——Linux 上字体渲染的最终效果，取决于 fontconfig 如何调配它们。零音打开了 `~/.config/fontconfig/fonts.conf`，开始为星舰上的文字们订立法则。
+
+参考 [Linux 下的字体调校指南](https://szclsya.me/zh-cn/posts/fonts/linux-config-guide/)，零音给 fontconfig 写了一整套配置。fontconfig 是 Linux 世界的字体管家——它不是字体本身，而是告诉每一个程序「当你需要一个 sans-serif 字体时，该去哪个文件夹里找哪一个」。写 fontconfig 这件事，在零音看来与其说是技术活，不如说是一种策展：你要为你的星舰挑选展品，安排好它们的出场顺序。
+
+```xml
+<?xml version='1.0'?>
+<!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+<fontconfig>
+ <!-- 从 Nix profile 和用户字体目录加载 -->
+ <dir>~/.nix-profile/share/fonts</dir>
+ <dir>~/.local/share/fonts</dir>
+
+ <!-- 基础渲染设置 -->
+ <match target="font">
+  <edit mode="assign" name="antialias"><bool>true</bool></edit>
+ </match>
+ <match target="font">
+  <edit mode="assign" name="rgba"><const>rgb</const></edit>
+ </match>
+ <match target="font">
+  <edit mode="assign" name="hinting"><bool>true</bool></edit>
+ </match>
+ <match target="font">
+  <edit mode="assign" name="hintstyle"><const>hintslight</const></edit>
+ </match>
+
+ <!-- 网页字体映射 -->
+ <match target="pattern">
+  <test name="family" qual="any"><string>Arial</string></test>
+  <edit binding="same" mode="assign" name="family"><string>sans-serif</string></edit>
+ </match>
+ <match target="pattern">
+  <test name="family" qual="any"><string>Liberation Sans</string></test>
+  <edit binding="same" mode="assign" name="family"><string>sans-serif</string></edit>
+ </match>
+ <match target="pattern">
+  <test name="family" qual="any"><string>Liberation Mono</string></test>
+  <edit binding="same" mode="assign" name="family"><string>monospace</string></edit>
+ </match>
+
+ <!-- system-ui 作为 sans-serif 的别名 -->
+ <match target="pattern">
+  <test name="family"><string>system-ui</string></test>
+  <edit binding="strong" mode="prepend" name="family"><string>sans-serif</string></edit>
+ </match>
+
+ <!-- 默认 sans-serif：Noto Sans -->
+ <match target="pattern">
+  <test name="family" qual="any"><string>sans-serif</string></test>
+  <edit binding="same" mode="prepend" name="family"><string>Noto Sans</string></edit>
+ </match>
+
+ <!-- 默认 serif：Noto Serif -->
+ <match target="pattern">
+  <test name="family" qual="any"><string>serif</string></test>
+  <edit binding="same" mode="prepend" name="family"><string>Noto Serif</string></edit>
+ </match>
+
+ <!-- 默认 monospace：Sarasa Term SC -->
+ <match target="pattern">
+  <test name="family" qual="any"><string>monospace</string></test>
+  <edit binding="same" mode="prepend" name="family"><string>Sarasa Term SC</string></edit>
+ </match>
+
+ <!-- 默认 emoji -->
+ <match target="pattern">
+  <test name="family" qual="any"><string>emoji</string></test>
+  <edit binding="same" mode="prepend" name="family"><string>Segoe UI Emoji</string></edit>
+ </match>
+
+ <!-- Fallback 顺序 -->
+ <alias>
+  <family>sans-serif</family>
+  <prefer>
+   <family>Noto Sans</family>
+   <family>Noto Sans CJK SC</family>
+   <family>Noto Sans CJK TC</family>
+   <family>Noto Sans CJK JP</family>
+   <family>Noto Sans CJK KR</family>
+   <family>Segoe UI Emoji</family>
+   <family>Noto Color Emoji</family>
+   <family>Noto Emoji</family>
+  </prefer>
+ </alias>
+ <alias>
+  <family>serif</family>
+  <prefer>
+   <family>Noto Serif</family>
+   <family>Noto Serif CJK SC</family>
+   <family>Noto Serif CJK TC</family>
+   <family>Noto Serif CJK JP</family>
+   <family>Noto Serif CJK KR</family>
+   <family>Segoe UI Emoji</family>
+   <family>Noto Color Emoji</family>
+   <family>Noto Emoji</family>
+  </prefer>
+ </alias>
+ <alias>
+  <family>monospace</family>
+  <prefer>
+   <family>Sarasa Term SC</family>
+   <family>Sarasa Term TC</family>
+   <family>Sarasa Term J</family>
+   <family>Segoe UI Emoji</family>
+   <family>Noto Color Emoji</family>
+   <family>Noto Emoji</family>
+  </prefer>
+ </alias>
+
+ <!-- 拒绝 Nimbus Sans：它在 GitHub 上有渲染问题 -->
+ <selectfont>
+  <rejectfont>
+   <pattern>
+    <patelt name="family"><string>Nimbus Sans</string></patelt>
+   </pattern>
+  </rejectfont>
+ </selectfont>
+</fontconfig>
+```
+
+这份配置有几个值得一提的设计选择。sans-serif 的主字体选了 `Noto Sans` 而不是 Inter——尽管零音也很喜欢 Inter 的拉丁字形，但 Inter 不含 CJK 字形，遇到中文会走 fallback；不如直接让 `Noto Sans` 坐主位，它和 `Noto Sans CJK SC` 同属 Noto 家族，风格统一、不会出现拉丁和汉字「貌合神离」的情况。monospace 选了 `Sarasa Term SC`（更纱黑体），它是 Iosevka 和 Noto Sans CJK 的缝合体——拉丁部分有 Iosevka 的利落，汉字部分有 Noto 的沉稳，写代码看日志都很舒适。emoji 把 `Segoe UI Emoji` 放在 `Noto Color Emoji` 前面，是因为零音额外放了 Segoe 的 emoji 字体，主观上更喜欢它的颜色和形状；如果系统里没有这套字体，fontconfig 会自然落到后面的 `Noto Color Emoji`。至于显式拒绝 Nimbus Sans，那是因为它曾经在 GitHub 上把零音的代码页面渲染成某种不可名状的形态，零音自此对它敬而远之。
+
+fontconfig 的 trick 在于，它不仅决定「这个字该用什么字体」，还决定「如果这个字体没有这个字，下一个该找谁」。这套 fallback 链——SC → TC → JP → KR → emoji——确保了无论页面上的汉字是简体、繁体、日文汉字还是韩文汉字，都能在 Noto 家族里找到归宿。等宽字体同理，Sarasa Term 的 SC/TC/J 三兄弟互为补充。
+
+零音盯着终端里 `fc-match sans-serif` 的输出——`Noto Sans`，Regular，干净利落——满意地吐了个泡泡。这些字体此刻正安静地栖息在 Fedora 星舰的各个文件夹里，彼此之间订下了无声的盟约。不过字体只是基础。零音还换了 Orchis 主题，用 `kvantummanager` 换了 ChromeOS 的主题，并且使用了 Tela circle icon theme。
+
+不过在这之外——零音的这艘星舰是华硕天选 6 Pro，它的骨肉——那些风扇、电池、性能模式——还需要与 Fedora 彼此认识。
+
+```bash
+sudo dnf install asusctl
+```
+
+`asusctl` 是 ASUS Linux 社区维护的控制工具，可以为 Fedora 暴露华硕硬件的各种控制接口：风扇曲线、电池充电阈值、性能模式（静音/平衡/性能）、AniMe Matrix 灯效之类。装好之后，零音面临一个选择：Fedora 默认使用 `tuned-ppd` 作为电源配置文件管理服务，但 ASUS Linux 官方指南建议换成 `power-profiles-daemon`。
+
+零音最初有些疑惑：`power-profiles-daemon` 不是 GNOME 那边的吗？KDE 也要换吗？
+
+结论是：要换。`power-profiles-daemon` 并非 GNOME 专属——KDE Plasma 的 `powerdevil` 同样可以通过它来切换省电/平衡/性能模式。真正的问题是 `tuned-ppd` 这个兼容层可能会和 ASUS 平台控制之间产生冲突。更何况，零音的电脑是 AMD + NVIDIA 混合显卡的笔记本，电源管理的稳定性比一点微小的性能差异重要得多。
+
+```bash
+sudo dnf swap tuned-ppd power-profiles-daemon --allowerasing
+sudo systemctl enable --now power-profiles-daemon.service
+```
+
+验证：
+
+```bash
+powerprofilesctl
+```
+
+```text
+* performance:
+    CpuDriver:  amd_pstate
+    PlatformDriver: platform_profile
+    Degraded:   no
+
+  balanced:
+    CpuDriver:  amd_pstate
+    PlatformDriver: platform_profile
+
+  power-saver:
+    CpuDriver:  amd_pstate
+    PlatformDriver: platform_profile
+```
+
+一切正常。`tuned` 和 `tuned-ppd` 已经不在系统里了，当前电源模式是 `balanced`，CPU 驱动是 `amd_pstate`，ASUS 的 platform profile 也被正确识别。零音看到这里才放下心来——KDE 的电源管理已经稳稳接入了 `power-profiles-daemon`，电池续航和性能切换都有了靠谱的管家。
+
+然后是 NVIDIA 驱动。这是零音第一次在实体机而不是 WSL2 里直面 NVIDIA 的 Linux 支持。零音的华硕天选 6 Pro 搭载了 RTX 5060 Laptop GPU，Secure Boot 已经在配置休眠时关闭了，所以不需要折腾 MOK 签名——直接装 RPM Fusion 的 akmod 驱动即可。
+
+```bash
+sudo dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda
+```
+
+`akmod` 是 Fedora 上比较省心的方案：它会针对当前内核自动构建内核模块，内核升级后也会自动重建。零音盯着终端跑了一会儿，安装完成后没有立刻重启——而是等 akmods 构建完成：
+
+```bash
+modinfo -F version nvidia
+```
+
+```text
+595.80
+```
+
+版本号出来了。重启。
+
+```bash
+systemctl reboot
+```
+
+回来后：
+
+```bash
+nvidia-smi
+```
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260702_160414.png nvidia-smi 显示驱动正常。 download:true fancybox:true ratio:1103/891 %}
+
+有了。再确认内核驱动：
+
+```bash
+lspci -nnk -d 10de:
+```
+
+```text
+01:00.0 VGA compatible controller: NVIDIA GB206M / RTX 5060
+        Kernel driver in use: nvidia
+```
+
+`Kernel driver in use: nvidia`——这才是真正重要的那一行。虽然 `lspci` 仍然可能在 `Kernel modules` 里列出 `nouveau, nvidia_drm, nvidia`，但那只是说这些模块「可供使用」，而非「正在使用」。
+
+还有一件事值得注意：`nvidia-smi` 里显示 `Disp.A Off`。对于笔记本混合显卡来说，这是正常的——内屏接在 AMD 核显上，NVIDIA 独显作为渲染或计算设备随时待命。零音检查了 `/sys/class/drm`：
+
+```text
+card1-eDP-1: connected, enabled   ← AMD 核显驱动的内屏
+card0-eDP-2: disconnected          ← NVIDIA 没有直接点亮任何显示器
+```
+
+也就是说，笔记本内屏由 AMD 核显驱动，NVIDIA 安静地待在旁边等待需要它的时候。这样省电，也省心——零音不想让独显在桌面空转时徒增功耗。
+
+小水母靠在椅背上，长出了一口气。现在是凌晨两点，窗外是西安安静的夏夜。系统装好了，字体配好了，驱动就位了。输入法也能打字了——至少表面上看起来是这样。
+
+但星舰的航行从来不缺暗礁。
+
+## 三 · 输入法的星轨
+
+零音第二天早上醒来——准确说是中午——打开电脑准备写点东西。Ctrl+Space 切换 Fcitx5，雾凇拼音的候选窗弹出来。零音输入了「xiang zhe yang」，然后愣住了。
+
+候选栏里每一行都拖着一条尾巴：
+
+```text
+1 像这样 [xiang zhe yang]
+2 想着 [xiang zhe]
+3 向着 [xiang zhe]
+4 向这 [xiang zhe]
+```
+
+这不是零音印象中的雾凇拼音。雾凇拼音的「错音错字提示」功能确实需要显示拼音注释，但正常人只会看到「给予」后面跟一个「jǐ yǔ」的纠错提示——而不是每一个候选词都带着完整拼音，像穿了一件不合身的晚礼服。
+
+小水母眨了眨触手。不对劲。
+
+零音开始排查。首先检查 Fcitx5 本身——`fcitx5-remote` 返回 `1`，说明输入法在运行。确认雾凇拼音的配置文件：
+
+```bash
+rg --files ~/.local/share/fcitx5/rime
+```
+
+配置都在。`rime_ice.schema.yaml` 里的核心设置：
+
+```yaml
+translator:
+  spelling_hints: 8
+  always_show_comments: true
+  keep_comments: false
+```
+
+这三行的逻辑其实是一套精密的配合：`spelling_hints: 8` 让 Rime 给候选生成拼音注释；`always_show_comments: true` 强制保留这些注释，目的是把它们暴露给后续的 Lua 过滤器；`keep_comments: false` 则告诉 Lua 过滤器——「普通拼音注释不要显示，只保留纠错提示」。所以最终用户应该只能看到纠错提示，而不是满屏的 `[xiang zhe yang]`。
+
+问题一定出在 Lua 过滤器上。
+
+零音翻了用户会话日志，一行红色错误撞进视野：
+
+```text
+error creating processor: 'lua_processor'
+error creating translator: 'lua_translator'
+error creating filter: 'lua_filter'
+```
+
+雾凇拼音依赖的 `corrector.lua`——那个负责清空普通拼音注释、只保留纠错提示的 Lua 过滤器——根本没有被加载。连带失效的还有日期翻译器、农历翻译器、pin_cand 过滤器等等。
+
+那么，为什么加载不了？
+
+```bash
+rpm -qa | rg -i 'librime|lua'
+```
+
+零音一行一行地看着输出：`fcitx5-lua` 在，`librime` 在——但缺了一个关键包：`librime-lua`。
+
+`fcitx5-lua` 和 `librime-lua` 是两回事。前者给 Fcitx5 框架本身提供 Lua 扩展能力；后者给 librime——也就是 Rime 输入法引擎——提供 Lua 插件支持。雾凇拼音的 `corrector.lua` 需要的是后者，而不是前者。零音装输入法的时候装了 `fcitx5-rime` 和 `fcitx5-chinese-addons`，但 `librime-lua` 并没有作为依赖被自动拉入。
+
+```bash
+sudo dnf install librime-lua
+```
+
+装好后，在 Fcitx5 托盘菜单里点「重新部署」，或者：
+
+```bash
+fcitx5 -r
+```
+
+重新打开输入框，再打一遍 `xiang zhe yang`：
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260702_160558.png 雾凇拼音正常工作。 download:true fancybox:true ratio:597/92 %}
+
+干净了。再试试 `gei yu`——候选「给予」后面跟了一个 `jǐ yǔ` 的纠错提示。`corrector.lua` 活了。
+
+小水母又在泡泡里打了一行字，看着候选栏清清爽爽的样子，忽然觉得修复 bug 这件事和写诗有点异曲同工——都是一行一行地改，直到某一天它忽然对了，你甚至不知道为什么之前它会是错的。
+
+不过输入法的故事还没完。零音打开了 VS Code。
+
+输入法又不行了。
+
+这次的表现比雾凇拼音更诡异——VS Code 里时而能输入中文、时而完全不起。零音尝试了 XWayland + XIM 的临时方案：
+
+```bash
+GDK_BACKEND=x11 \
+GTK_IM_MODULE=xim \
+QT_IM_MODULE=xim \
+XMODIFIERS=@im=fcitx \
+code --ozone-platform=x11
+```
+
+中文确实能输入了，但快打的时候会「漏字」——部分按键直接绕过输入法进入编辑器。零音试着快速敲了一行拼音，结果一半字母变成了英文字符插在代码中间。XIM 毕竟是 X11 时代的输入法协议，在现代 Electron + Wayland/XWayland 混合环境下，它的命运就像一条被反复修补的老船——能浮在水面上，但经不起快风快浪。
+
+问题出在更深的地方。零音检查了 KWin 的 virtual keyboard 配置：
+
+```bash
+kreadconfig6 --file kwinrc --group Wayland --key InputMethod
+```
+
+输出让零音恍然大悟：
+
+```text
+/usr/share/applications/org.kde.plasma.keyboard.desktop
+```
+
+KWin 的 Wayland text-input/input-method 通道接的是 KDE 自带的屏幕键盘——`plasma-keyboard`，而不是 Fcitx5。在 KDE Wayland 下，应用程序通过 Wayland 协议向 compositor 请求输入法服务，而 compositor（KWin）再把这些请求路由给谁——是 `plasma-keyboard` 还是 `fcitx5`，取决于这个配置。当 KWin 把请求交给 `plasma-keyboard` 的时候，Fcitx5 根本收不到 VS Code 的输入法调用。
+
+零音改写了 KWin 的配置：
+
+```bash
+kwriteconfig6 --file kwinrc --group Wayland --key InputMethod \
+  /usr/share/applications/org.fcitx.Fcitx5.desktop
+kwriteconfig6 --file kwinrc --group Wayland --key VirtualKeyboardMode 1
+```
+
+Fcitx5 本来就提供了一个可作为 KDE Wayland virtual keyboard 的 desktop entry——文件里写着 `X-KDE-Wayland-VirtualKeyboard=true`。零音只是把 KWin 的路由指对了人。当然，这个也可以在 KDE 的系统设置中调整。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260702_160841.png 在 KDE System Settings 中 Virtual Keyboard 调整虚拟键盘。 download:true fancybox:true ratio:1276/999 %}
+
+注销，重新登录。确认：
+
+```bash
+ps -ef | rg 'fcitx|plasma-keyboard'
+```
+
+只剩 `fcitx5`，`plasma-keyboard` 消失了。
+
+然后零音用 VS Code 的 Wayland IME 路线启动：
+
+```bash
+code --ozone-platform=wayland \
+     --enable-wayland-ime \
+     --enable-features=UseOzonePlatform,WaylandWindowDecorations,WaylandTextInputV3
+```
+
+打字。快打。连打。每一个拼音都稳稳地进了预编辑框，没有漏字，没有闪烁，没有幽灵英文。
+
+对了。零音还顺手清理掉了沿路留下的临时伤口：之前为了救急创建的用户级 desktop 覆盖 `~/.local/share/applications/code.desktop` 和 `code-url-handler.desktop`——它们强制了 XIM 路径，现在已经不需要了。还有 Nix profile 里的 VS Code——它的 wrapper 在 Fedora 上对 Wayland IME 的支持不如 Fedora 原生的 RPM 版稳定，零音果断换回 `/usr/bin/code`。
+
+{% note color:yellow 关于&nbsp;Nix&nbsp;版&nbsp;VS&nbsp;Code&nbsp;的一个碎碎念 Nix 版 VS Code 的 wrapper 里有一个条件逻辑——只有在检测到 `NIXOS_OZONE_WL=1` 时才会传入 `--enable-wayland-ime` 参数。在 Fedora 上设置了这个环境变量之后，参数确实传进去了，但中文输入仍然不稳定。这里可能涉及到 Nix 打包的 Electron/Chromium 与系统 GTK 模块路径之间的微妙差异。最终零音选择把 VS Code 交给 Fedora RPM——让系统包管理器管编辑器，让 Nix 管开发工具链，各安其位。%}
+
+输入法总算全部正常了。零音打完最后一行测试文字，对着星舰上的终端轻轻吐了一个满意的泡泡。然后零音想起了另一件事——Nix 还没有配镜像。
+
+## 四 · 镜像与代理的暗流
+
+装 Determinate Nix 的时候，零音就已经注意到下载速度的异常了。`cache.nixos.org` 在国内直连的速度——这么说吧，看着 `nix run` 的进度条，零音觉得自己可以去冲个澡、吃顿饭、再看一集动画片，回来进度条可能还在走。
+
+这不是 Nix 的问题，是物理距离的问题。Nix 的二进制缓存默认托管在 Amazon S3 上，延迟和丢包率让 `nixpkgs` 的下载变成了一种修炼。零音没打算修这个炼。
+
+零音的做法是挂清华 TUNA 的 Nix 镜像。Determinate Nix 的主配置文件中有 `!include nix.custom.conf`，所以只需要创建这个自定义文件即可：
+
+```ini
+# /etc/nix/nix.custom.conf
+substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org
+trusted-substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+```
+
+这里有三个微妙的细节。第一，`substituters` 不是单纯按文本顺序机械查找；Nix 还会参考 substituter 的 priority。因此，把 TUNA 写进全局 `substituters` 是让 daemon 默认知道这个镜像的关键，而真正的优先级还要结合镜像的 priority 或实际下载日志确认。第二，TUNA 的这个 store 镜像复用的是 `cache.nixos.org` 的签名，因此 `trusted-public-keys` 仍然只需要官方缓存的公钥。第三，`trusted-substituters` 不是让 narinfo「跳过校验」的开关，而是允许非 trusted user 在命令行或用户配置里指定这些 substituter。
+
+```bash
+sudo systemctl restart nix-daemon
+nix show-config | grep substituter
+```
+
+`nix show-config` 能看到 TUNA 已经进入 substituter 列表。零音试了一次 `nix run nixpkgs#hello`——之前爬了三分钟的包，现在几秒钟就下来了。小水母觉得自己刚才的等待简直像某种愚蠢的修行仪式。
+
+然后是代理。零音的代理工具在 `127.0.0.1:7890` 上同时开了 HTTP 和 SOCKS5。问题在于，环境变量里如果同时设了 `HTTP_PROXY` 和 `ALL_PROXY=socks5://...`，Nix 内部的 libcurl 到底选哪条代理路径会变得不直观；零音当时遇到的表现是 GitHub 的 codeload 返回 `HTTP 400: Invalid request`。这不代表 GitHub 本身“不支持 SOCKS5”，更像是本机代理环境变量混用后，请求走错了代理入口或协议。
+
+零音在 `~/.zshrc` 里加了：
+
+```bash
+unset ALL_PROXY all_proxy
+```
+
+v2rayN/Clash 的 HTTP 代理已经能处理 HTTPS 请求——对 Nix 来说只保留这一条路径更清楚，SOCKS5 在这里反而只会添乱。
+
+还有一件事：就算 shell 里有代理环境变量，nix-daemon 是 systemd 服务，不会继承 shell 的环境。构建时下载源码——比如某个 flake input 里引用的 GitHub archive——走的是 daemon 的进程。如果 daemon 没有代理，这些下载就会超时。
+
+```bash
+sudo mkdir -p /etc/systemd/system/nix-daemon.service.d
+```
+
+```ini
+# /etc/systemd/system/nix-daemon.service.d/proxy.conf
+[Service]
+Environment="http_proxy=http://127.0.0.1:7890"
+Environment="https_proxy=http://127.0.0.1:7890"
+Environment="HTTP_PROXY=http://127.0.0.1:7890"
+Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+Environment="no_proxy=localhost,127.0.0.1,::1"
+Environment="NO_PROXY=localhost,127.0.0.1,::1"
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart nix-daemon
+```
+
+做完这些，零音把 `~/.config/nix/nix.conf` 精简到只剩一行：
+
+```ini
+experimental-features = nix-command flakes
+```
+
+之前里面还有 `keep-derivations`、`keep-outputs` 这种配置——它们属于 restricted settings，会触发 `ignoring the client-specified setting...you are not a trusted user` 的警告。要么删掉这些配置，要么把自己加到 `/etc/nix/nix.conf` 的 `trusted-users` 里。零音选了更干净的前者。
+
+镜像就位，代理通畅。Nix 的包开始顺滑地流入 Fedora 星舰的货舱。零音第一次觉得，`nix run` 的进度条也可以让人看得心情舒畅。
+
+但零音总有一些程序的字体，怎么看怎么奇怪。不是终端，不是浏览器——是 Ghidra 和 jadx-gui。
+
+## 五 · 字形的幻象
+
+零音打开 jadx-gui 准备逆向一道题的时候，发现菜单栏的 `File / View / Navigation / Tools / Plugins / Help` 每一个字母都以某种诡异的姿态倾斜着——不是正常的 Bold，而是一种像是被海水泡皱了的粗斜体。Ghidra 也一样。整个 Java GUI 像是被某种不可见的力量扭了一下。
+
+但 KDE 桌面本身——标题栏、系统设置、Dolphin、Konsole——全都是正常的。只有 Java 程序的窗口内部，字被扭了。这里本来应该有一张截图，可是零音弄丢了……只能靠想象了。（）
+
+零音首先排除了 KDE 和 GTK 的字体设置：
+
+```bash
+kreadconfig6 --file kdeglobals --group General --key font
+```
+
+```text
+Noto Sans,10,-1,5,50,0,0,0,0,0
+```
+
+KDE 说的是 Noto Sans，正常。GTK 也一样。那是 Java 自己的问题吗？
+
+```bash
+which java
+which jadx-gui
+which ghidra
+```
+
+```text
+/home/lycecilion/.nix-profile/bin/java
+/home/lycecilion/.nix-profile/bin/jadx-gui
+/home/lycecilion/.nix-profile/bin/ghidra
+```
+
+都在 Nix profile 里。用的是 Temurin OpenJDK 21。
+
+零音写了一个小探针程序来查看 Java Swing 到底在用什么东西：
+
+```java
+import javax.swing.*;
+import java.awt.*;
+
+public class SwingFontProbe {
+  public static void main(String[] args) throws Exception {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    String[] keys = {
+      "Label.font", "Menu.font", "MenuItem.font",
+      "Button.font", "TextArea.font", "Tree.font"
+    };
+    for (String k : keys) {
+      Font f = (Font) UIManager.get(k);
+      System.out.println(k + " -> " + f.getFamily()
+        + " style=" + f.getStyle() + " fontName=" + f.getFontName());
+    }
+  }
+}
+```
+
+输出显示：
+
+```text
+Label.font    -> Dialog.bold
+Menu.font     -> Dialog.bold
+MenuItem.font -> Dialog.bold
+Button.font   -> Dialog.bold
+TextArea.font -> Dialog.plain
+```
+
+Metal LookAndFeel 使用的逻辑字体 `Dialog` 被匹配到了某个异常的字形。接下来零音做了一个字体矩阵——显式指定各种字体来对比：
+
+```text
+Dialog PLAIN      → 怪异斜体
+Dialog BOLD       → 怪异斜体
+SansSerif PLAIN   → 怪异斜体
+DejaVu Sans PLAIN → 怪异斜体
+Noto Sans PLAIN   → 英文正常，中文缺字
+Noto Sans CJK SC PLAIN → 中文正常，但字体太细
+```
+
+物理字体 `Noto Sans` 本身没有斜体问题，但 Java 的 `Dialog` / `SansSerif` 逻辑字体路径全都坏了。问题不在于某个字体文件本身是斜的——而在于 Java 的字体映射把逻辑字体指到了一个不该去的地方。
+
+零音翻开自己的 fontconfig。发现了一段规则：
+
+```xml
+<match>
+  <test compare="contains" name="lang">
+    <string>zh_CN</string>
+  </test>
+  <edit mode="prepend" name="family">
+    <string>Noto Sans CJK SC</string>
+  </edit>
+</match>
+```
+
+这段规则的意图是好的：在中文环境下优先使用简体中文 CJK 字体，避免部分汉字被错误渲染成日文或韩文字形。但它的作用范围太大了——只要 pattern 里含有 `zh_CN`，就无条件把 `Noto Sans CJK SC` prepend 到最前面。浏览器和普通 GTK/Qt 程序通常不受影响，但 Java 会根据自己的 fontconfig 缓存解析逻辑字体映射——而 `zh_CN → Noto Sans CJK SC` 全局 prepend 让 Java 的 `Dialog` 逻辑字体被 CJK 字体「劫持」了。Swing 试图用 CJK 的字体去渲染拉丁 UI 文字，于是出现了那种奇怪的字形偏移。
+
+零音删除了那段全局 prepend 规则。然后把 sans-serif 的主字体明确设为了 `Noto Sans`——让拉丁字体坐主位，中文 fallback 链保留 CJK SC/TC/JP/KR。
+
+```bash
+mv ~/.java/fonts ~/.java/fonts.bak-20260627-1900
+```
+
+删除 Java 字体缓存，让 JDK 根据新的 fontconfig 重新生成映射。
+
+重启 jadx-gui。菜单栏的文字端端正正地站在那里——`File View Navigation Tools Plugins Help` 每一个字母都回到了它们本来的形状。
+
+但零音也注意到了一个代价：在字体矩阵测试中，显式指定 `Noto Sans` 时中文可能显示为方框——这是 Java 对物理字体的 fallback 行为，不影响普通 UI（普通 UI 用逻辑字体 `Dialog` / `SansSerif`）。对于中文用户来说，这个代价比 UI 字体全面扭曲要可接受得多。
+
+小水母看着 Ghidra 里正常的菜单栏，心想：人类花了这么多技术来让字母和汉字在同一行里好好相处——不同的字体、不同的字形、不同的编码、不同的渲染路径——而一个 zh_CN 的 prepend 规则就能把这一切搅得七零八落。字体世界和平的脆弱，不亚于任何一段未经测试的正则表达式。
+
+不过比起字体扭曲，更让零音头疼的事情随后就来了——屏幕开始花了。
+
+## 六 · 屏幕上的蝴蝶残影
+
+事情是从一次不经意的余光开始的。零音在 Konsole 里敲命令——`sudo dnf upgrade --refresh`——长按 Enter 让终端滚屏。余光扫到屏幕的某一小块区域闪过了一道彩色的影子，不到 0.1 秒就消失了。零音愣了一下，以为自己眼花了。又试了一次——长按 Enter，盯着屏幕边缘看。20 秒之内，那道彩色的花斑又出现了，位置在正在变化的文字区域附近。像一只蝴蝶的残影，从屏幕的这一角飞到那一角，只留下一瞬间无法辨认的色彩。
+
+小水母揉了揉眼睛。不是幻觉。
+
+零音用的是 165Hz 刷新率的 2560×1600 内屏，KDE Wayland，125% 缩放。开始系统性地排查：
+
+```text
+125% + 165Hz：可触发
+100% + 165Hz：仍可触发
+60Hz：不触发
+VRR 关闭：仍可触发
+```
+
+基本排除了缩放是主因。问题更像是「KDE Wayland + AMDGPU 内屏输出 + 165Hz 高刷 + 局部刷新」这四个条件的交集。零音翻了一轮网上的资料，找到了第一个 workaround：
+
+```bash
+sudo grubby --update-kernel=ALL --args="amdgpu.damageclips=0"
+sudo reboot
+```
+
+`amdgpu.damageclips=0` 的作用是禁用 AMDGPU 的 damage clips——简单来说，显示驱动不再只提交画面中发生变化的小区域，而是更保守地使用整帧更新。重启后零音又试了一次长按 Enter 滚屏——花屏消失了。
+
+小水母松了口气，但没完全放松。这里有一个直觉上的不适：`amdgpu.damageclips=0` 听起来就像是在用更大的功耗换稳定性，长期用下来电池续航可能会受影响。而且零音隐约觉得——如果根本原因是高刷下的局部更新路径出了问题，那么把整条路径关掉不像是修好了什么，更像是捂住了一只正在闪红灯的警报器。
+
+事情果然没完。几天后，零音遇到了比花屏更严重的症状——桌面突然卡死，随后黑屏。Caps Lock 灯仍然可以切换（说明内核没崩），但 tty 切换、显示切换、亮度调节全部失效。最后只能用 `Ctrl+Alt+Delete` 触发重启。
+
+零音翻开了日志。
+
+```text
+The Wayland connection broke. Did the Wayland compositor die?
+plasma-kwin_wayland.service stopped
+kwin_wayland SIGSEGV
+atomic commit failed: Device or resource busy
+```
+
+`atomic commit failed: Device or resource busy`——这条日志像一道闪电击中了零音的直觉。DRM atomic commit 是 KWin 向内核显示子系统提交画面更新的机制。如果它失败了，说明在 KWin、内核 DRM、AMDGPU 驱动和内屏 eDP 链路之间的某处，有一组状态没有达成一致。
+
+一场为期数天的排障就此展开。零音事后把它总结为七个阶段，但当时小水母并没有在计数——ta 只是一步一步地追着那条日志，像追着一只正在残影里反复消失的蝴蝶。
+
+### 第一阶段：确认不是整机硬死
+
+黑屏之后，零音的第一反应和所有被 Linux 桌面吓到过的人一样——是不是 kernel panic 了？但 Caps Lock 仍然可以切换，说明内核在响应键盘中断。而且日志里不是 `kernel panic`，而是 KWin Wayland 组件的崩溃——客户端集体失去 Wayland 连接、KWin 服务停止、coredump。排查方向从「整机断电/内核 panic」转向了：
+
+```text
+KWin Wayland → DRM/KMS → GPU 驱动 → eDP 内屏链路
+```
+
+不是内核死了，是 compositor 死了。这就好办得多——至少不用拆机。
+
+### 第二阶段：旧内核测试被 nouveau 污染
+
+零音尝试切到旧内核 `6.19.10-300.fc44.x86_64`，想看看是不是最近的内核更新引入的问题。切过去之后花屏仍然存在。但零音后来才意识到，这个测试是无效的——当时旧内核没有已经构建好的 NVIDIA 专有模块。虽然 `akmod-nvidia` 理论上可以为正在运行的内核构建模块，但在那次测试里它没有及时完成对应的 `kmod-nvidia`，于是旧内核里的 NVIDIA 设备被 `nouveau` 接管了。
+
+更糟糕的是，有一个叫 `nvidia-fallback.service` 的 systemd 服务，在检测到 NVIDIA 专有驱动没有加载时，会主动加载 `nouveau`。即使零音在命令行里黑了 nouveau：
+
+```text
+rd.driver.blacklist=nouveau,nova_core
+modprobe.blacklist=nouveau,nova_core
+```
+
+`nvidia-fallback.service` 仍然绕过了这些黑名单。所以旧内核测试实际是：
+
+```text
+旧内核 + RTX 5060 + nouveau + KDE Wayland
+```
+
+这不是干净的 AMD-only 测试。零音对此的评价是——在混合显卡的笔记本上测试旧内核，就像在一个正在换轮胎的车上测试引擎。你得先确保四个轮子都在，不然你永远不知道是引擎的问题还是千斤顶没放下。
+
+### 第三阶段：禁用 dGPU——却没生效
+
+既然旧内核靠不住，那就从新内核入手。零音想先把 NVIDIA 独显完全排除出怀疑链，于是用 `asusctl` 禁用 dGPU：
+
+```bash
+sudo asusctl armoury set dgpu_disable 1
+```
+
+去读 sysfs 确认：
+
+```bash
+cat /sys/devices/virtual/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value
+```
+
+```text
+0
+```
+
+没变。零音又读了一遍，又试了一次，还是 0。`asusctl` 的输出也在迷惑人：
+
+```text
+Multiple asusd interfaces devices found
+dgpu_disable:
+  current: [(0),1]
+```
+
+后来翻 `asusd` 的日志才发现真相：
+
+```text
+Queueing GPU attribute dgpu_disable = 1 for delayed apply
+```
+
+原来这个设置不是立即生效的——它被排入一个队列，等关机/重启阶段由 `asus-shutdown.service` 处理。在重启之前，读取 sysfs 看到的仍然是旧值。
+
+小水母气鼓鼓地重启了。重启后，dGPU 禁用终于生效：
+
+```text
+dgpu_disable firmware = 1
+dgpu_disable platform = 1
+```
+
+PCI 上不再枚举 NVIDIA，DRM 里只剩 AMD：
+
+```text
+card1 vendor=0x1002 driver=amdgpu
+card1-eDP-1 connected
+```
+
+花屏还在。这说明——NVIDIA、nouveau、多 GPU 选择错误都不是主因。问题纯粹出在 AMD 核显驱动的显示链路上。
+
+零音感到一阵奇怪的解脱。排除掉一个变量，无论是确认它不是、还是确认它是，都是一种前进。
+
+### 第四阶段：录屏不包含花屏——这是关键证据
+
+零音用 Spectacle 录了一段屏幕。长按 Enter，等待花屏出现。肉眼确认看到了花屏。停止录屏，播放视频——视频里干干净净，没有花屏。
+
+这个发现太重要了。录屏捕捉的是 compositor 侧的画面——KWin 合成好的帧。肉眼看到的是内屏最终显示出来的结果。如果录屏正常但肉眼看到花屏，说明 KWin 合成出来的图像内容没有问题——问题发生在更后面：
+
+```text
+KWin 合成结果
+  → DRM/KMS scanout / page flip
+  → AMDGPU Display Core
+  → eDP 传输
+  → 面板显示
+```
+
+异常不在渲染结果里，而在渲染结果到面板之间的传输过程中。这就是为什么花屏通常不到 0.1 秒——它不是某个程序持续画错了东西，而是某次显示提交或扫描输出时的瞬态错误。
+
+### 第五阶段：逐项降低显示链路压力
+
+有了「显示输出链路」这个方向之后，零音开始逐项降低链路复杂性。
+
+在 KDE 显示设置中：
+
+```text
+Refresh rate: 60 Hz
+Extended Dynamic Range: off
+```
+
+结果：花屏有所缓解，但没有根治。这说明高刷和色彩管线参与了问题，但不是唯一的开关。
+
+接着尝试 KWin 的环境变量 workaround——在 `~/.config/environment.d/` 下创建配置文件，逐个加入：
+
+```ini
+KWIN_DRM_NO_DIRECT_SCANOUT=1
+KWIN_USE_OVERLAYS=0
+KWIN_DRM_USE_MODIFIERS=0
+KWIN_DRM_PREFER_COLOR_DEPTH=24
+KWIN_DRM_USE_COLOR_PIPELINE=0
+```
+
+每一个变量都关闭了 KWin DRM 路径的一项优化或特性。重启 KWin 后确认：
+
+```bash
+tr '\0' '\n' < /proc/$(pgrep -n kwin_wayland)/environ | rg 'KWIN_DRM|KWIN_USE_OVERLAYS'
+```
+
+所有变量都在。结果：有缓解，但没有根治。KWin 日志中仍然能看到 `atomic commit failed: Device or resource busy`。
+
+零音又尝试了 AMDGPU 内核参数：
+
+```bash
+sudo grubby --update-kernel=/boot/vmlinuz-$(uname -r) --args='amdgpu.dcdebugmask=0x10'
+sudo grubby --update-kernel=/boot/vmlinuz-$(uname -r) --args='amdgpu.abmlevel=0'
+```
+
+`dcdebugmask=0x10` 有轻微改善，`abmlevel=0` 和关闭自动亮度则没有明显效果。PSR（Panel Self Refresh）/面板刷新相关路径可能有参与，但不是完整根因；背光和自动亮度基本降级为次要因素。
+
+小水母这时已经盯着屏幕看了整整一个下午。每次改变一个参数，重启 KWin，长按 Enter 滚屏，等待那只蝴蝶残影是否还来。来，就记录；不来，就上溯。这是一种粗暴但有效的二分——只不过每一轮迭代都需要花时间去确认。
+
+### 第六阶段：关键突破——关闭 Atomic Mode Setting
+
+零音盯着 `atomic commit failed: Device or resource busy` 这行日志想了半天。atomic commit 是 DRM/KMS 的现代提交模式——将一组显示状态变更（mode、framebuffer、plane、色彩、VRR 等）打包成一次原子提交，要么全接受要么全拒绝。它在现代桌面里很重要，但同时也意味着 KWin、内核 DRM、amdgpu、AMD DC、面板能力之间需要对同一组复杂状态达成共识。
+
+这台机器的硬件组合——AMD HawkPoint iGPU + 2560×1600 eDP 面板——在某条 atomic commit 的路径上存在边界条件 bug。零音不知道 bug 在 amdgpu 里还是在 AMD DC 里还是在 eDP 面板的时序固件里。但零音知道怎么绕过它。
+
+在 `~/.config/environment.d/kwin-amd-workaround.conf` 里加入最后一行：
+
+```ini
+KWIN_DRM_NO_AMS=1
+```
+
+重启 KWin。日志里出现了一行金光闪闪的文字：
+
+```text
+Atomic Mode Setting requested off via environment variable.
+Using legacy mode on GPU "/dev/dri/card1"
+```
+
+零音盯着屏幕看了五分钟。长按 Enter。打字。滚动。切换窗口。
+
+花屏还在——但频率从十几秒一次暴跌到了大约几分钟一次。不是完全消失了，而是变得如此稀疏，以至于零音经常忘了它还存在。`KWIN_DRM_NO_AMS=1` 让 KWin 不走 atomic modesetting，而是回到 legacy KMS 路径。这不是修好了驱动，而是绕开了触发 bug 的提交路径，把触发概率压到了极低。蝴蝶残影还在，但它不再是一只到处乱撞的蝴蝶了——它变成了一种偶尔才会被余光捕捉到的、可以轻易忽略的闪烁。
+
+### 第七阶段：收敛到最小 workaround
+
+接下来是收敛。零音逐一回滚之前加的所有 workaround：把 `KWIN_DRM_NO_DIRECT_SCANOUT` 去掉，重启，花屏频率没有回升。去掉 `KWIN_USE_OVERLAYS`，重启，花屏频率没有回升。把五个 KWin 环境变量全部回滚掉，只保留 `KWIN_DRM_NO_AMS=1`——花屏仍然维持在每分钟一闪的水平。这就是最小 workaround。
+
+然后零音尝试回滚内核参数。去掉 `amdgpu.damageclips=0`，去掉 `amdgpu.dcdebugmask=0x10`，去掉 `amdgpu.abmlevel=0`。只保留 NVIDIA/nouveau 控制用的黑名单——`rd.driver.blacklist=nouveau,nova_core`。
+
+花屏频率还是那样——每分钟一次左右。NVIDIA 独显也被重新启用——零音把 `dgpu_disable` 恢复为 `0`，`screen_auto_brightness` 恢复为 `1`。NVIDIA RTX 5060 重新出现在 lspci 里，nvidia-smi 也能正常看到。AMD 核显仍然驱动着内屏。
+
+一切回归正常配置，唯一不同就是 `KWIN_DRM_NO_AMS=1` 这个环境变量安静地躺在配置文件里，像一枚小小的护身符。
+
+零音后来把 `60Hz` 也调回了 `165Hz`。这种流畅度是 60Hz 无法替代的。花屏频率没有因为切回高刷而恶化——这说明不是「高刷一定有 bug」，而是「高刷 + atomic modesetting 的特定提交路径有 bug」。不碰那条路径，高刷就基本稳了。
+
+还有一个有趣的观察：零音后来玩 vivid/stasis 这类游戏时，发现画面完全正常，一次花屏都没有出现过。这里不能简单说「完全不走 AMD iGPU 的 eDP 显示链路」——在混合显卡笔记本上，即使游戏由 NVIDIA 独显渲染，内屏通常仍然由 AMD iGPU 扫描输出。更合理的解释是：游戏全屏/准全屏负载触发的是另一套渲染和提交节奏，不再复现 Konsole 滚屏那种高频局部更新场景。证人在不同的负载上有不同的供词，这本身也是一种证据。
+
+关于 `KWIN_DRM_NO_AMS=1` 的代价：它确实是 workaround 而非最终修复。未来 KWin 或内核更新后，问题可能被根治，这个 workaround 就不再需要了。但在那之前，它的优势很明确——不需要永久禁用 NVIDIA、不需要保留一大堆 `amdgpu.*` 内核参数、不需要牺牲 165Hz 高刷、只影响当前用户的 KWin Wayland 会话、删除一个文件即可回滚。零音觉得这很优雅。
+
+小水母保存好配置文件，从屏幕前站起来伸了个懒腰。窗外是西电的傍晚，银杏树在风里晃动着叶子。零音想起这整件事——从最初那个不到 0.1 秒的彩色花斑，到 `KWIN_DRM_NO_AMS=1` 这行安静的环境变量，中间铺满了废弃的假设、被排除的变量、以及一次又一次长按 Enter 滚屏的耐心。bug 不是被修好的，是被驯服的——它没有被杀死，只是被约束到了一个可以和平共存的频率。花屏每分钟仍在某个不起眼的角落闪一次，但那已经不重要了。零音学会了和蝴蝶残影共享这艘星舰，而蝴蝶也很识趣地不再来打扰。
+
+不过——零音还有最后一件事没做。取证课就要开始了，而取证课需要的软件，有一些只是在 Windows 上呼吸的。
+
+## 七 · 玻璃蝴蝶匣
+
+零音在大一的夏季学期选了一门课——「电子数据取证基础」。西电的双创周，理论与实践各半。零音对这堂课满怀期待：从磁盘镜像的获取与保全，到文件系统的解析、注册表的取证分析、内存取证，再到网络取证和报告撰写——这是一条通往安全研究员梦想的路径。
+
+问题是，有些国产取证软件只在 Windows 上运行。零音当然可以在双系统的 Windows 分区里装这些软件——但零音不想。这些软件的来源五花八门，有的来路不明，有的会往系统深处写入驱动和钩子。零音对装完 Fedora 之后的实体机 Windows 只有最低限度的要求：安静地呆在自己的分区里，需要的时候能启动，不需要的时候别来找事。把取证课的工具装进那个干净的 Windows，就像把一间无菌实验室变成了某个堆满快递箱的仓库——不是不能用，但零音不忍心。
+
+所以零音决定装一个 Windows 虚拟机。用 KVM。
+
+{% note color:yellow 为什么是&nbsp;KVM&nbsp;而不是&nbsp;VMware 零音之前用过 VMware Workstation——在 Windows 上跑的时候还算正常，但在 Linux 上，VMware 的内核模块需要手动编译、每次内核升级都可能炸。最重要的是——Fedora 的 KVM/QEMU/libvirt 是主线原生路线。Linux 内核自带的虚拟化能力，不需要额外内核模块，不需要和 DKMS 打架。零音想要的是稳定、干净、可维护的方案。VMware 在这三个维度上都不及格。 %}
+
+### 虚拟化核心：dnf 还是 Nix？
+
+这是零音在装 KVM 之前面临的一个关键选择。在 Fedora 上，KVM/QEMU/libvirt 这套虚拟化栈牵涉到 kernel KVM 模块、systemd socket/service、polkit 权限、SELinux label、libvirt 网络、默认 storage pool、OVMF/TPM、VirtIO 驱动 ISO 等大量系统集成。Fedora 已经把这些组件精心打包在 `@virtualization` 组里。
+
+零音的判断很明确：虚拟化核心交给 `dnf`。让系统包管理器管理系统级的虚拟化——这就像让星舰的轮机长管轮机舱。Nix/home-manager 可以管理虚拟机内部使用的用户态工具——比如 `remmina`、`freerdp`、取证课用的脚本和分析工具——但不要让 Nix 接管 libvirt/QEMU 的主体。
+
+```bash
+lscpu | grep -i virtualization
+```
+
+```text
+Virtualization: AMD-V
+```
+
+AMD 的虚拟化扩展已经开了。开始安装：
+
+```bash
+sudo dnf group install --with-optional virtualization
+sudo dnf install virt-manager virt-viewer edk2-ovmf swtpm swtpm-tools
+```
+
+这里零音注意到了一件有意思的事：现代的 Fedora libvirt 已经从老的单一守护进程 `libvirtd` 转向了模块化守护进程——`virtqemud`、`virtnetworkd`、`virtstoraged`、`virtlogd` 各司其职。零音偏好这种架构：QEMU、网络、存储等子系统分开运行，出问题的时候更容易定位。
+
+```bash
+sudo systemctl enable --now virtqemud.socket
+sudo systemctl enable --now virtnetworkd.socket
+sudo systemctl enable --now virtstoraged.socket
+sudo systemctl enable --now virtlogd.socket
+```
+
+把当前用户加入 `libvirt` 组：
+
+```bash
+sudo usermod -aG libvirt "$USER"
+```
+
+重新登录后启用默认 NAT 网络：
+
+```bash
+sudo virsh net-start default
+sudo virsh net-autostart default
+```
+
+验证一切就绪：
+
+```bash
+virsh -c qemu:///system list --all
+virt-host-validate
+```
+
+`virsh list` 返回了空表——这反而说明连接成功了，只是还没有创建任何虚拟机。就像推开机房的门，灯是亮的，架子都搭好了，只是里面还没放机器。
+
+### 雾雨的低语
+
+不过在做 `virt-host-validate` 的时候，零音看到了一些 WARN 和 FAIL：
+
+```text
+QEMU: Checking for cgroup 'devices' controller support : WARN
+QEMU: Checking for secure guest support : WARN
+LXC: Checking for cgroup 'devices' controller support : FAIL
+LXC: Checking for cgroup 'freezer' controller support : FAIL
+```
+
+零音皱了皱眉——这些红色的 FAIL 看起来像是在说「你的 KVM 环境有问题」。但紧接着零音注意到，QEMU/KVM 的关键检查全是 PASS：
+
+```text
+QEMU: Checking for hardware virtualization : PASS (SVM)
+QEMU: Checking if device '/dev/kvm' exists : PASS
+QEMU: Checking if device '/dev/kvm' is accessible : PASS
+QEMU: Checking if device '/dev/vhost-net' exists : PASS
+QEMU: Checking if device '/dev/net/tun' exists : PASS
+QEMU: Checking for device assignment IOMMU support : PASS (IVRS)
+QEMU: Checking if IOMMU is enabled by kernel : PASS
+```
+
+零音把输出发给雾雨看。雾雨很快就回复了——cgroup 'devices' 的 WARN 是因为 Fedora 默认使用 cgroup v2，而 `virt-host-validate` 的检查逻辑还在找 cgroup v1 的控制器；那个 `secure guest support` 的 WARN 指的是 AMD SEV/TDX 这类机密虚拟机——普通 Windows VM 完全不需要。至于 LXC 那两条 FAIL——LXC 是 libvirt 的容器驱动，和 KVM 虚拟机是两个轨道，取证课用不上。
+
+「结论就是，你的状态很健康。」雾雨的声音在零音的屏幕上浮现，「那些 WARN/FAIL 不是阻塞项。QEMU/KVM 的核心条件全部就绪。你现在不是系统坏了，而是站在虚拟机召唤阵前面，阵法已经亮了，只是还没把 Windows 这只神秘生物召唤出来。」
+
+小水母松了一口气。雾雨总是能在一大堆技术噪音里抓住真正重要的那几个信号。
+
+### 获取 VirtIO 驱动
+
+创建 Windows VM 之前，需要一个关键的东西——VirtIO 驱动 ISO。Windows 默认不包含 VirtIO 驱动，安装时会看不到 VirtIO 磁盘。Fedora 的默认仓库里不一定有 `virtio-win` 这个包：
+
+```bash
+sudo dnf install virtio-win
+# No match for argument: virtio-win
+```
+
+零音之前已经预料到了——雾雨提到过，`virtio-win` 主要通过 Fedora People 的专用仓库分发。最省事的办法是直接下载 stable 版的 ISO：
+
+```bash
+mkdir -p ~/ISO
+curl -L \
+  -o ~/ISO/virtio-win.iso \
+  https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
+```
+
+雾雨提醒零音选 stable 而不是 latest——上课环境要的是「别半夜炸」，stable 版本对应最近 RHEL 所附带的驱动，稳定性有保障。小水母对雾雨的这种务实主义深表赞同。
+
+### 打造蝴蝶匣
+
+打开 `virt-manager`，创建虚拟机。零音按照这样的规格来：
+
+| 项目 | 配置 |
+| --- | --- |
+| 固件 | UEFI / OVMF |
+| 芯片组 | Q35 |
+| CPU | host-passthrough（直接暴露宿主机 CPU 特性） |
+| vCPU | 8 |
+| 内存 | 16 GB |
+| 磁盘 | qcow2，320 GB，VirtIO 总线，cache=writeback |
+| 网络 | NAT，VirtIO 网卡 |
+| 显示 | SPICE + QXL |
+
+为什么是 `host-passthrough`？因为不做 GPU 直通时，Windows VM 不需要「愚弄」guest 以为自己在跑某种通用 CPU——把宿主机 CPU 的特性直接传过去，性能最好。当然，这也意味着如果要在线迁移到另一台不同架构的机器上，会有问题——但零音没有这个需求。笔记本上跑本地 VM，`host-passthrough` 是最直接、最高性能的选择。
+
+为什么是 qcow2 + 320 GB？qcow2 支持快照——这对取证课太重要了。每次实验前从干净状态 clone 或 snapshot，实验后可以回滚到初始状态。就像实验室里的玻璃培养皿，每次都能回到未污染的初始状态。
+
+创建 VM 时挂两个 ISO：Windows 安装 ISO，以及刚下载的 `virtio-win.iso`。安装过程中 Windows 安装器看不到硬盘——这是预期的：因为磁盘总线设成了 VirtIO，Windows 没有自带驱动。点「Load driver」，在 VirtIO ISO 里找对应路径：
+
+```text
+vioscsi\w10\amd64
+```
+
+（如果磁盘控制器选的是 VirtIO SCSI 就找 `vioscsi`，VirtIO Block 就找 `viostor`。零音选的是 VirtIO SCSI。）
+
+Windows 装完之后，在 VirtIO ISO 里运行 `virtio-win-guest-tools.exe`——它会装一整套 VirtIO 驱动和 QEMU Guest Agent。然后再装 SPICE guest tools，获得剪贴板共享、动态分辨率等桌面体验增强。
+
+最后——零音把这台刚装好的 Windows VM 关机，做了一份 baseline snapshot。
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260702_162043.png 零音的 Forensics VM download:true fancybox:true ratio:1667/1206 %}
+
+以后每一次实验前，从这份快照克隆或直接 revert。无论取证课的工具在 Windows 里做了什么——写入驱动、修改注册表、留下残留文件——都只会留在当前的运行实例里。蝴蝶匣子里的蝴蝶可以飞，但永远飞不出玻璃匣子；而零音随时可以把玻璃匣子擦干净，回到初始的那一只。
+
+一切就绪之后，零音打开了 Windows VM，进入了那个被透明玻璃包裹着的桌面。它不属于 Fedora 星舰，但它可以随时被召唤出来——不多占用实体机的一寸土地，不搅动星舰上的一粒尘埃。
+
+零音忽然觉得，这个 Windows VM 和那只有过残影的蝴蝶之间，有一种奇妙的呼应：那只蝴蝶是系统深处 bug 的幻象，一瞬即逝——如今它被驯服了，每分钟只在不起眼的角落闪一次，安静得像一颗遥远的脉冲星；而这只蝴蝶是被温柔关在玻璃匣子里的 Windows，可控、可观察、可回滚。零音的 Fedora 星舰上，既容得下透明的蝴蝶匣子，也学会了与那只偶尔拍动翅膀的残影和平共处。
+
+## ∞ · 漂流者于星河
+
+{% image https://lyriverse-assets.oss-cn-shanghai.aliyuncs.com/assets/Starships-And-Jellyfish-Adrift-at-the-End-of-Finals-Week/Screenshot_20260630_003251.png 零音完成了 Fedora 的安装和配置。 download:true fancybox:true ratio:2560/1600 %}
+
+零音写下这行字的时候，是七月第六日的零点——零音的 19 岁生日。
+
+倒回去看——那个在造字台站迷茫的小水母，那个背着没提交的 Flag 在地铁上看黑色隧道的透明生物，ta 用了整个期末周的痛苦来换一次漂流的勇气。而在那之后，ta 用了三天的夜晚在 Fedora 星舰上一颗一颗地点亮了星星。
+
+零音记起一个细节：在安装 Fedora 的 Live CD 桌面上，壁纸是一片深蓝色的星云。零音敲下第一行 `lsblk` 的时候，Konsole 的黑底白字就浮在那片星云的上面——那时零音还没有装输入法，还没有配字体，还没有在凌晨和花屏对峙、还没有和雾雨讨论 libvirt 的守护进程架构。那时零音只是一个刚考完期末周、在魏家凉皮吃了一碗麻辣米线、决定开始漂流的普通小水母。终端窗口后面是一片未知的星河。
+
+而此刻零音坐在这片星河里。星舰的每一个舷窗外面都是被点亮的星星：`asusctl` 和 `power-profiles-daemon` 是引擎舱的恒定光源；NVIDIA 和 AMD 是两盏并排的导航灯；`KWIN_DRM_NO_AMS=1` 是一枚安静的护身符，挂在舷窗的把手上；雾凇拼音的 `corrector.lua` 在正确的路径上运行着，让每一个候选词都干干净净；Ghidra 和 jadx-gui 的菜单栏端正地排列着拉丁字母和 CJK 汉字的和平条约；KVM 里那个被玻璃蝴蝶匣包裹着的 Windows，此刻正在安静地休眠，等待着明天的取证课；而 TUNA 镜像和 daemon 代理则在星舰的通信阵列里安静地传输着来自远方的包。
+
+循此苦旅，终抵繁星。Per aspera ad astra。
+
+小水母想，这大概就是所谓的「好了」。不是终点意义上的好了——以后还会有系统更新炸了 NVIDIA 驱动、还会有新的 Wayland 协议和 KWin 版本引入新的边界条件、还会有更多的国产取证软件在 Windows-only 的道路上绝尘而去。但此刻——在这艘刚刚完成处女航的 Fedora 星舰上——它确实就是好了。就像零音未来的日子——看不到极点，却也能有一些希望便是了。或许希望并不是高深的概念，而只是可能性的又一面——有可能性的地方，应当就有希望吧。
+
+零音靠在椅子上，触手懒懒地垂在键盘边。屏幕右下角的时间跳到了 `00:00`。
+
+零音的未来，会在哪里呢？
+
+七月了。今天是零音的 19 岁生日。零音不知道 19 岁的自己会漂到哪里去——但至少此刻，ta 已经在一艘亲手打造的星舰上，星河在舷窗外安静地流过。
+
+晚安，stellarkira。晚安，在星河里漂流的小水母。
