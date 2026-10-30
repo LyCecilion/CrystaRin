@@ -136,22 +136,25 @@
   }
 
   .image-grid {
-    @apply items-stretch;
+    /* 列数自适应：每张照片至少 15rem 宽，避免在宽屏上被压成细条 */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    @apply items-start;
     
     center {
-      @apply h-full w-full;
+      @apply w-full;
       
       figure {
-        @apply flex flex-col h-full w-full m-0 p-0;
+        @apply flex flex-col w-full m-0 p-0;
         
         img {
-          @apply object-cover w-full grow rounded-xl m-0;
-          /* 使图片自动填满所在网格高度（自适应裁剪居中，不拉伸变形） */
-          height: 100%;
+          /* 保留原图宽高比，不再随行高被拉伸裁剪 */
+          @apply w-full h-auto rounded-xl m-0;
         }
         
         figcaption {
-          @apply mt-2 mb-0;
+          @apply mt-2 mb-0 text-center text-[0.8125rem] leading-relaxed;
+          color: var(--content-meta);
+          text-wrap: pretty;
         }
       }
     }

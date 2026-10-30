@@ -1,14 +1,62 @@
 {
+	"apsdehal/awesome-ctf": {
+		"description": "A curated list of CTF frameworks, libraries, resources and softwares",
+		"language": "JavaScript",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/3616806?v=4",
+		"license": "CC0-1.0"
+	},
 	"cuteleaf/firefly": {
 		"description": "🍀Firefly, fresh and aesthetic Astro blog theme template. ",
 		"language": "Astro",
 		"avatarUrl": "https://avatars.githubusercontent.com/u/43440669?v=4",
 		"license": "MIT"
 	},
+	"dxhm/sectool": {
+		"description": "Cybersecurity tool repository / Wiki 收录常用 / 前沿 的CTF和渗透工具以及其 官方/使用 文档，致力于让每个工具都能发挥作用ww，不管你是萌新还是领域从业者希望你都能在这里找到适合你的工具或者获得一定的启发。",
+		"language": null,
+		"avatarUrl": "https://avatars.githubusercontent.com/u/69539047?v=4",
+		"license": "GPL-3.0"
+	},
+	"mrexodia/ida-pro-mcp": {
+		"description": "AI-powered reverse engineering assistant that bridges IDA Pro with language models through MCP.",
+		"language": "Python",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/2458265?v=4",
+		"license": "MIT"
+	},
+	"p4nda0s/ida-no-mcp": {
+		"description": "Say goodbye to the complex, verbose, and laggy interaction mode of IDA Pro MCP",
+		"language": "Python",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/9513384?v=4",
+		"license": null
+	},
+	"pa55w0rd/secknowledge-skill": {
+		"description": "SecKnowledge - Web与AI安全测试知识技能",
+		"language": null,
+		"avatarUrl": "https://avatars.githubusercontent.com/u/16274549?v=4",
+		"license": null
+	},
 	"saicaca/fuwari": {
 		"description": "✨A static blog template built with Astro. ",
 		"language": "Astro",
 		"avatarUrl": "https://avatars.githubusercontent.com/u/25200299?v=4",
 		"license": "MIT"
+	},
+	"weschera/qwen3.8-27b-omlx-mtp-mac": {
+		"description": "Qwen 3.8 27B at 48-65 tok/s on a Mac Studio M4 Max — measured oMLX native-MTP recipe, same-day A/B vs mlx-vlm+MTP sidecar, raw benchmark JSON included",
+		"language": "Python",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/283870186?v=4",
+		"license": null
+	},
+	"yaklang/hack-skills": {
+		"description": "Helping AI Agent become an awesome practical hacker!",
+		"language": "CSS",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/84704082?v=4",
+		"license": "MIT"
+	},
+	"zinja-coder/jadx-mcp-server": {
+		"description": "MCP server for JADX-AI Plugin",
+		"language": "Python",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/65374935?v=4",
+		"license": "Apache-2.0"
 	}
 }

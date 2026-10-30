@@ -591,6 +591,35 @@ html {
   --_spoiler-mask: color-mix(in oklch, var(--primary) 55%, white 45%);
 }
 
+/* 荧光笔高亮：<mark> 红色、<mark-purple> 紫色，文字颜色跟随正文 */
+.custom-md mark,
+.custom-md mark-purple {
+  color: inherit;
+  padding: 0.05em 0.2em;
+  border-radius: 0.25rem;
+  /* 断行时每一行都保留底色与圆角 */
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.custom-md mark {
+  --_mark-bg: color-mix(in oklch, var(--admonitions-color-caution) 50%, white);
+  background-color: var(--_mark-bg);
+}
+
+:root.dark .custom-md mark {
+  --_mark-bg: color-mix(in oklch, var(--admonitions-color-caution) 34%, transparent);
+}
+
+.custom-md mark-purple {
+  --_mark-bg: color-mix(in oklch, var(--admonitions-color-important) 60%, white);
+  background-color: var(--_mark-bg);
+}
+
+:root.dark .custom-md mark-purple {
+  --_mark-bg: color-mix(in oklch, var(--admonitions-color-important) 34%, transparent);
+}
+
 /* 文章列表布局切换样式 */
 .post-list-layout-switch {
   @apply flex items-center gap-2 mb-6 p-3 bg-(--card-bg) rounded-lg border border-(--line-divider);
