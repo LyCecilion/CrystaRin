@@ -1,0 +1,87 @@
+---
+/**
+ * 题记 / 引文块。
+ *
+ * 用于引出典籍、定义或铭文一类的文字：居中、疏排、字号略大，
+ * 与普通引用（`>` 会渲染成左侧竖线）区分开来，读起来更像「题记」。
+ *
+ * 用法（MDX）：
+ *   import Epigraph from "@/components/misc/Epigraph.astro";
+ *   <Epigraph cite="《晋书·天文志》">客星，非常之星……</Epigraph>
+ */
+interface Props {
+	/** 出处或署名，渲染为「—— 出处」；省略则不显示 */
+	cite?: string;
+}
+
+const { cite } = Astro.props;
+---
+
+<figure class="epigraph">
+	<blockquote><slot /></blockquote>
+	{cite && <figcaption>—— {cite}</figcaption>}
+</figure>
+
+<style>
+	.epigraph {
+		margin: 2.75rem auto;
+		max-width: 42rem;
+		padding: 0 0.5rem;
+		text-align: center;
+	}
+
+	/* 顶部装饰短线 */
+	.epigraph::before {
+		content: "";
+		display: block;
+		width: 2.25rem;
+		height: 2px;
+		margin: 0 auto 1.35rem;
+		border-radius: 999px;
+		background-color: color-mix(in oklch, var(--primary) 70%, transparent);
+	}
+
+	/* 去掉普通引用的左侧竖线，改为疏排的居中题记 */
+	.epigraph blockquote {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 1.0625rem;
+		font-style: normal;
+		font-weight: 400;
+		line-height: 2.1;
+		letter-spacing: 0.08em;
+		/* 居中排版下均衡两行的长度，避免出现「长行 + 半行」的三角形状 */
+		text-wrap: balance;
+	}
+
+	.epigraph blockquote::before {
+		content: none;
+	}
+
+	/* slot 内容是 MDX 写的，需要 :global 才能作用到里面的段落 */
+	.epigraph blockquote :global(p) {
+		margin: 0;
+	}
+
+	.epigraph blockquote :global(p + p) {
+		margin-top: 0.9rem;
+	}
+
+	.epigraph figcaption {
+		margin-top: 1.05rem;
+		font-size: 0.875rem;
+		letter-spacing: 0.03em;
+		color: var(--content-meta);
+	}
+</style>
+
+<style is:global>
+	/*
+	 * 紧邻题记的导语段落：用 pretty 折行，避免最后一两个字被单独甩到下一行。
+	 * 不用 balance —— 那会把两行都压到半列宽，体量与正文其余段落不一致。
+	 */
+	.custom-md p:has(+ figure.epigraph) {
+		text-wrap: pretty;
+	}
+</style>

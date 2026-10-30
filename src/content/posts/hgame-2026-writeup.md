@@ -2,8 +2,13 @@
 title: HGAME 2026 题解
 published: 2026-02-20
 description: 依旧 HGAME 2026 陪跑人，事实上也没做出几个题来。
-# tags:
-# category:
+tags:
+  - HGAME
+  - Pwn
+  - Reverse
+  - CTF
+category: CTF
+author: 林曦格 SigAurelia
 ---
 
 零音以林曦格（SigAurelia）的名义在 HGAME 2026 中完成了部分题目。由于时间仓促，零音并未做完所有题目，下面的 writeup 仅包括零音成功完成的题目。

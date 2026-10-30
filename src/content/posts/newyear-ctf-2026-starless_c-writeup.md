@@ -2,8 +2,13 @@
 title: NewYear CTF 2026 starless_c 题解
 published: 2026-02-22
 description: 这真是新年让小水母做的题吗？畏惧了……求放过。
-# tags:
-# category:
+tags:
+  - NewYear CTF
+  - Reverse
+  - ELF
+  - CTF
+  - Linux
+category: CTF
 ---
 
 零音新年两天纯玩了，根本没时间做题，只完成了 starless_c 一道题，这里给出记录。其实感觉 NewYear CTF 的时间可以延长一下，至少延长到一周吧。跨年期间真没时间做 CTF 诶。

@@ -4,8 +4,13 @@ published: 2026-02-21
 updated: 2026-10-11
 description: 「一试寄寄寄，二试急急急！」零音对数学的热爱，还有未来吗？
 # image:
-# tags:
-# category:
+tags:
+  - 数学竞赛
+  - AGMC
+  - 数论
+  - 概率
+  - 组合数学
+category: 数学
 ---
 
 <!--markdownlint-disable MD033 MD034-->

@@ -2,8 +2,11 @@
 title: 致 神楽坂 零音 的两周年
 published: 2026-02-15 00:00:00
 description: 跨越两年后，LyCecilion 写给 KaguReion 的一封信。
-# tags:
-# category:
+tags:
+  - Hazelita
+  - 神楽坂 零音
+  - LyRiverse
+category: 随笔
 ---
 
 ```txt

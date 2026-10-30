@@ -3,8 +3,14 @@ title: 从群到 ElGamal 加密算法
 published: 2025-10-16
 updated: 2026-10-29
 description: 群是什么？裴蜀定理又是什么？它们和 ElGamal 算法又有什么联系？
-# tags:
-# category:
+tags:
+  - ElGamal
+  - 群论
+  - 裴蜀定理
+  - 公钥密码
+  - Crypto
+  - CTF
+category: 密码学
 ---
 
 :::note

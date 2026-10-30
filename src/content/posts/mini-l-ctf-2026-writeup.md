@@ -4,6 +4,14 @@ published: 2026-05-07
 updated: 2026-10-29
 description: 单论题目：是有趣的。不论题目：与你合作的不一定是人类；与你竞争的也不一定。
 image: ./mini-l-ctf-2026-writeup/minil2026.png
+tags:
+  - Mini L-CTF
+  - Misc
+  - Reverse
+  - Pwn
+  - Web
+  - CTF
+category: CTF
 ---
 
 <!--markdownlint-disable MD033 MD034-->
@@ -1531,10 +1539,6 @@ if __name__ == "__main__":
 ```
 
 ![通过时间侧信道 oracle 恢复远程 Flag 的结果](./mini-l-ctf-2026-writeup/oracle.png)
-
-$$
-\LARGE ❤️🕊️
-$$
 
 ### 1byte
 

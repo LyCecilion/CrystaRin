@@ -2,8 +2,13 @@
 title: 漫谈 Baby-Step Giant-Step 算法
 published: 2025-10-16
 description: BSGS—「小步大步」，还是「北上广深」？
-# tags:
-# category:
+tags:
+  - BSGS
+  - 离散对数
+  - 算法
+  - Crypto
+  - CTF
+category: 密码学
 ---
 
 :::tip[题目]

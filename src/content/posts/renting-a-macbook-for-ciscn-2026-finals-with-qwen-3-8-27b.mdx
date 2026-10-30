@@ -1,8 +1,16 @@
 ---
-title: 租台 MacBook 线下带，Qwen 3.8 (27B) 打国赛！
+title: 租台 MacBook 线下带，Qwen 3.8 打国赛！
 published: 2026-09-09
 updated: 2026-10-29
 description: 我们租了一台 MacBook Pro，配好 Qwen 3.8 27B，并把它带到了 CCISC 2026 决赛。
+tags:
+  - macOS
+  - Nix
+  - 本地大模型
+  - Qwen
+  - MLX
+  - CTF
+category: 折腾
 ---
 
 import Epigraph from "@/components/misc/Epigraph.astro";
@@ -346,7 +354,7 @@ $$
 
 减少了某些公共前缀的重复计算是好事，但新增的 tool output、对话尾部和动态部分仍然需要处理。
 
-另外，prefill 阶段同样也是不得不品的一环。洛汐使用了一个 36k 长度的上下文进行测试，模型在 prefill 初期可以达到 200 token/s 的速度，但越往后则速度越慢；处理到第 18k 个 token 时，模型的速度已经降到了 150 token/s。这样看，洛汐之前测试时「一句话 prompt 只要约 0.1 s 就能出第 1 个 token」也就不难理解了；但在当时这套 MLX/LM Studio 配置下，一个 50k token 的上下文也的确用了约 10 分钟才能处理成功。需要注意，prefill 和前面估算的单 token decode 并不是同一种负载：长上下文 prefill 还会受到 attention 计算、KV Cache、分块策略和 runtime 实现等因素影响，不能只用「内存带宽不够」来解释。可以确认的是，这套配置在长上下文下退化得很明显。**毕竟，若跑足够强的大模型只需租一台 MacBook Pro 的话，那这样的比赛不就纯变成了 AI 赛吗？那就没有多少意义了。**洛汐于是这么想着，想啊想……
+另外，prefill 阶段同样也是不得不品的一环。洛汐使用了一个 36k 长度的上下文进行测试，模型在 prefill 初期可以达到 200 token/s 的速度，但越往后则速度越慢；处理到第 18k 个 token 时，模型的速度已经降到了 150 token/s。这样看，洛汐之前测试时「一句话 prompt 只要约 0.1 s 就能出第 1 个 token」也就不难理解了；但在当时这套 MLX/LM Studio 配置下，一个 50k token 的上下文也的确用了约 10 分钟才能处理成功。需要注意，prefill 和前面估算的单 token decode 并不是同一种负载：长上下文 prefill 还会受到 attention 计算、KV Cache、分块策略和 runtime 实现等因素影响，不能只用「内存带宽不够」来解释。可以确认的是，这套配置在长上下文下退化得很明显。:mark[毕竟，若跑足够强的大模型只需租一台 MacBook Pro 的话，那这样的比赛不就纯变成了 AI 赛吗？那就没有多少意义了。]洛汐于是这么想着，想啊想……
 
 ### GGUF 和 Speculative Decoding
 
