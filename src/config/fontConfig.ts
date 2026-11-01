@@ -46,12 +46,34 @@ export const fontsList: FontDefinition[] = [
 		fallbacks: ["sans-serif"],
 	},
 	{
-		name: "JetBrains Mono",
-		cssVariable: "--font-jetbrains-mono",
-		provider: "fontsource",
-		weights: ["400", "700"],
-		styles: ["normal"],
-		subsets: ["latin", "cyrillic"],
+		name: "Maple Mono NF CN",
+		cssVariable: "--font-maple-mono-nf-cn",
+		provider: "local",
+		display: "swap",
+		options: {
+			variants: [
+				{
+					src: ["./public/assets/fonts/MapleMono-NF-CN-Regular.woff2"],
+					weight: 400,
+					style: "normal",
+				},
+				{
+					src: ["./public/assets/fonts/MapleMono-NF-CN-Bold.woff2"],
+					weight: 700,
+					style: "normal",
+				},
+				{
+					src: ["./public/assets/fonts/MapleMono-NF-CN-Italic.woff2"],
+					weight: 400,
+					style: "italic",
+				},
+				{
+					src: ["./public/assets/fonts/MapleMono-NF-CN-BoldItalic.woff2"],
+					weight: 700,
+					style: "italic",
+				},
+			],
+		},
 		fallbacks: [
 			"ui-monospace",
 			"SFMono-Regular",
@@ -83,6 +105,10 @@ export const fontsList: FontDefinition[] = [
 	},
 ];
 
+// 动态输入也保留完整的可打印 ASCII，不受当前文章内容限制。
+const printableAscii =
+	" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
 // ─── 字体选择与区域覆盖 ─────────────────────────────────────
 export const fontConfig: FontSelectionConfig = {
 	// 是否启用自定义字体功能
@@ -100,11 +126,14 @@ export const fontConfig: FontSelectionConfig = {
 	// 导航栏标题字体
 	navbarTitleFont: "",
 	// 代码块字体（用于代码高亮和等宽字体场景）
-	codeFont: "--font-jetbrains-mono",
+	codeFont: "--font-maple-mono-nf-cn",
 
 	// 本地字体子集化配置（构建时由 scripts/subset-fonts.ts 处理）
 	// key 为 fonts 数组中对应的 cssVariable，value 为子集化选项
 	subsetFonts: {
+		"--font-maple-mono-nf-cn": {
+			extraChars: printableAscii,
+		},
 		"--font-greatvibes": {
 			// 额外包含的字符
 			extraChars: "",

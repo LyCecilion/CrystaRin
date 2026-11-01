@@ -78,3 +78,17 @@ import { profileConfig } from "@/config/profileConfig";
 - `siteConfig.ts` 只保留站点核心信息，不聚合其他模块配置
 - `navBarConfig.ts` 底部的 `LinkPresets` 可自由自定义导航栏链接的名称、图标和 URL
 - `displaySettingsConfig.ts` 的视图设置面板默认关闭，除了修改配置里的 `enable`，也可以在部署平台（Vercel / Cloudflare 等）设置环境变量 `PUBLIC_DISPLAY_SETTINGS=true` 开启，无需改动配置文件；环境变量优先级更高，取值 `true/1/on/yes` 开启、`false/0/off/no` 关闭
+
+## 自托管字体
+
+`fontConfig.ts` 中的全局字体使用系统字体（`selected: ["system"]`）；代码块与行内代码使用自托管的 **Maple Mono NF CN**。首页横幅仍保留 Zen Maru Gothic 标题和 Inter 副标题的独立覆盖。
+
+| 字体 | 固定版本与上游 | 本地资源 |
+|------|---------------|----------|
+| Maple Mono NF CN | [v7.9](https://github.com/subframe7536/maple-font/releases/tag/v7.9)，`MapleMono-NF-CN-unhinted.zip` | `public/assets/fonts/MapleMono-NF-CN-*.woff2`（Regular、Bold、Italic、BoldItalic） |
+
+- 本地 WOFF2 由官方 TTF 完整字库转换而来，保留原字形和 OpenType 特性；许可证保存在同目录的 `MapleMono-LICENSE.txt`，字体及其生成子集均遵循 SIL OFL 1.1。
+- `pnpm build` 在 Astro 构建后按全站静态 HTML 收集字符，生成带内容哈希的 WOFF2 子集，替换 HTML/CSS 与预加载引用，并移除部署目录中的完整字库。正文不加载自定义字体；代码字体使用 `swap`，保留等宽字体回退。
+- `subsetFonts` 为 Maple Mono NF CN 额外保留了全部可打印 ASCII。静态页面中的中文、符号及 Nerd Fonts 图标会随构建收录；运行时才出现且未收录的字符会回退。需要固定保留的动态文字或图标可添加到对应的 `extraChars`，然后重新构建。
+- 更换字体时同步维护 `fontsList`、`selected` / `codeFont`、`subsetFonts` 和许可证。不要给静态字体声明并不存在的字重；新增文章后按正常流程重新构建即可。开发期间修改字体配置需重启开发服务器。
+- Giscus 位于独立 iframe 中，不继承这里的站点字体设置。

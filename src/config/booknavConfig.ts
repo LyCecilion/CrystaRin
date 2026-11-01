@@ -3,10 +3,10 @@ import type { BooknavGroup, BooknavPageConfig } from "../types/booknavConfig";
 // 书签导航页面配置
 export const booknavPageConfig: BooknavPageConfig = {
 	// 页面标题，如果留空则使用 i18n 中的翻译
-	title: "",
+	title: "WORK IN PROGRESS",
 
 	// 页面描述文本，如果留空则使用 i18n 中的翻译
-	description: "",
+	description: "WORK IN PROGRESS",
 
 	// favicon 自动获取配置
 	favicon: {
