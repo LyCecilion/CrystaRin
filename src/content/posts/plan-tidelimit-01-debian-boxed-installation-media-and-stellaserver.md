@@ -1077,7 +1077,9 @@ flowchart TD
 - `/etc/restic` 与备份程序自身；
 - `containers.json`、`images.txt`：容器部署元数据及本机镜像身份信息。
 
-`containers.json` 里可能含秘密环境变量，只能留在受保护的暂存区和加密仓库里，绝不能当成公开文章附件。
+这里顺便补一个零音后来才想起来的问题：那些装了一堆密钥的 `.env` 到底备没备？备了。脚本复制的是整个 `/srv/compose`，没有排除隐藏文件，所以 Wakapi、Umami、Hindsight 的 `.env`，以及 Compose 或 Glance 配置中直接写进去的令牌，都跟着进入备份；Vaultwarden 数据目录里的 RSA 私钥也在范围内。否则只有数据库、没有启动服务需要的秘密，恢复起来照样抓瞎。
+
+这些文件在本机暂存时是明文，上传 OSS 前由 Restic 加密，并不是把 `.env` 裸着扔进 Bucket。`containers.json` 里也可能含秘密环境变量，只能留在受保护的暂存区和加密仓库里，绝不能当成公开文章附件。反过来说，拿到仓库密码和对象访问权限的人也能读到这些秘密，所以仓库密码必须认真保管；备份范围以外的 `.env` 则不会凭空被收进去。
 
 以及，这不是整机备份。没有覆盖操作系统、Docker 镜像层、SSH 密钥、Caddy 运行时证书目录 `/var/lib/caddy`、其他路径下的 SNI Gate 二进制／配置。恢复这些组件得另行准备，所以别把这一节理解成「一键还原整台机器」。
 
@@ -1150,7 +1152,7 @@ restic check --read-data-subset=10%
 - 查看恢复后的笔记资源和监控状态；
 - 在恢复后的 Umami／Hindsight 里执行真实业务查询。
 
-所以这次完成的是**文件恢复验证、SQLite 完整性检查和 PostgreSQL 归档可读性检查**，不是完整的应用级灾难恢复演练。`pg_restore --list` 成功，不代表角色、扩展和业务功能一定能在新环境里完整恢复。
+所以这次完成的是文件恢复验证、SQLite 完整性检查和 PostgreSQL 归档可读性检查，不是完整的应用级灾难恢复演练。`pg_restore --list` 成功，不代表角色、扩展和业务功能一定能在新环境里完整恢复。
 
 ### 再交给 systemd timer
 
@@ -1209,9 +1211,76 @@ sudo /usr/local/sbin/stella-backup prune
 
 这些周期保留规则是共同作用的，同一个快照可能同时满足多条规则，所以不是简单地保留 7 + 4 + 12 份，也不是把 12 个月内的所有快照全部留下。
 
-**该命令会删除策略之外的快照以及无引用对象，执行前必须确认保留需求。这次没有执行它，也没有为它配置定时器。** 所以当前状态是持续新增备份、不自动清理，存储成本会随着数据变化慢慢积累。
+该命令会删除策略之外的快照以及无引用对象，执行前必须确认保留需求。这次没有执行它，也没有为它配置定时器。所以当前状态是持续新增备份、不自动清理，存储成本会随着数据变化慢慢积累。
 
-**失败通知暂时没做。** 讨论过两层方案：一层是 systemd `OnFailure=` 推送任务失败，另一层是外部成功心跳，用来发现服务器整体宕机或者任务根本没运行。但通知渠道一直没定下来，所以最终没有部署任何失败通知或外部心跳。**现在任务失败不会自动有人来提醒**，得主动去看；也不能把服务器自己的 Uptime Kuma 当成整机宕机的唯一外部观察者——机器都没了，谁来看它？
+### 给备份加一个「到点报到」
+
+最初零音把失败通知搁置了：不用飞书、钉钉，国内服务器直接走 Telegram 又不太顺手。后来发现，其实 Uptime Kuma 已经有一个飞书 Bot 通知渠道，那不如让备份也接进去——零音自己不用飞书，不影响机器人替零音打工（
+
+这里选择的不是监控 OSS 能不能访问，也不是看备份进程有没有在跑，而是 Uptime Kuma 的 **Push／推送监控**：备份完整成功之后报到；超过约定时间没报到，就让 Kuma 报警。这种方式也能发现 timer 没运行，而不只是进程明确报错。
+
+新建监控时这样设置：
+
+| 项目 | 设置 |
+| --- | --- |
+| 类型 | Push／推送 |
+| 名称 | Restic 每日备份 |
+| 心跳间隔 | `93600` 秒，即 26 小时 |
+| 重试次数 | `0` |
+| 通知 | 勾选已有的飞书 Bot |
+
+每天凌晨备份一次，留到 26 小时是为了给随机延迟和执行时间留一点宽限，不是要求备份运行 26 小时。保存之后，Kuma 会生成带令牌的 Push URL。这个地址允许持有者伪造心跳，不能贴进公开日志或博客；下面用 `YOUR_PUSH_TOKEN` 代替真实令牌。
+
+服务器上先创建配置文件，再填内容：
+
+```bash
+sudo install -m 600 /dev/null /etc/restic/kuma-push.conf
+sudoedit /etc/restic/kuma-push.conf
+```
+
+`install` 在这里把读取到的空内容写成普通文件，并设置权限，不会把 `/dev/null` 的特殊设备类型也复制过去。注意这条命令再次执行会清空已有配置；以后更新令牌只用 `sudoedit`，只改权限则用 `chmod`。
+
+填入以下 curl 配置，令牌换成 Kuma 刚生成的那一个：
+
+```ini
+url = "http://127.0.0.1:3001/api/push/YOUR_PUSH_TOKEN?status=up&msg=Backup%20OK"
+fail
+silent
+show-error
+connect-timeout = 10
+max-time = 30
+```
+
+这里是 `http://`，不是 `https://`。零音顺手写成 HTTPS，结果收获了 `curl: (35) ... wrong version number`。原因是 Kuma 本机的 `3001` 端口提供普通 HTTP，公网 HTTPS 在 Caddy 那一层终止；这不是证书校验失败，加 `-k` 也解决不了。配置文件只允许 root 读写，推送地址不会直接放进 systemd 单元或 curl 的命令行参数里。
+
+接下来只给每日备份的那个实例加一个 drop-in，不给所有检查任务都加：
+
+```bash
+sudo mkdir -p /etc/systemd/system/stella-backup@backup.service.d
+
+sudo tee /etc/systemd/system/stella-backup@backup.service.d/kuma.conf >/dev/null <<'EOF'
+[Service]
+ExecStartPost=/usr/bin/curl --config /etc/restic/kuma-push.conf
+EOF
+
+sudo systemctl daemon-reload
+```
+
+这一步需要系统已有 curl。`Type=oneshot` 的备份主程序成功退出后，systemd 才执行 `ExecStartPost`。因此备份失败不会发送成功心跳，`check` 和 `verify` 也不能替每日备份续命。推送请求本身若失败，整个单元会显示失败，但不会撤销已经上传的快照；排错时要分清是备份失败，还是成功后的通知失败。
+
+联调时单独执行：
+
+```bash
+sudo curl --config /etc/restic/kuma-push.conf
+```
+
+预期返回 `{"ok":true}`，并在 Kuma 页面看到心跳时间更新。如果返回 `ok:false`，仍然要检查令牌、监控是否启用等配置；curl 的 `fail` 只根据 HTTP 错误状态判断失败，不会替我们理解 JSON 里的业务状态。
+
+手动发送这一次只是验证接通，不代表新备份已经完成。随后还要在下一次 systemd 备份结束后，核对日志和 Kuma 的心跳时间，才能确认自动链路；单独执行 `stella-backup backup` 不经过 systemd，也就不会触发这个 `ExecStartPost`。想手动验证整条链路，应执行 `sudo systemctl start stella-backup@backup.service`，但记得它会真的短暂停服并备份。
+
+这也不是即时失败推送：任务失败后，不会立刻调用 `OnFailure=`，而是等成功心跳超时才报警。每周仓库检查、每月恢复验证也没有单独接入这条心跳监控，仍然需要查看各自的任务状态。
+
+最后，边界还是得写清楚：Kuma 和备份程序在同一台服务器上。整机宕机时，Kuma 自己也发不出飞书通知，所以这不是独立的外部心跳监控。
 
 ### 万一真要迁移到新服务器
 
