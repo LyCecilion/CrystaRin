@@ -21,9 +21,9 @@ stellaServer 是零音在阿里云上海的一台轻量应用服务器，原来�
 
 ![在阿里云平台上，重置 Debian 的最高镜像版本为 Debian 12.10](./plan-tidelimit-01-debian-boxed-installation-media-and-stellaserver/reset-system-debian-12.10.png)
 
-似乎在 ECS 云服务器上是可选 Debian 13 的，因为官方的 [动态与公告](https://www.alibabacloud.com/help/zh/ecs/debian) 里明确写了 Debian 13 版本，并且其 Debian 12 的版本也最高到 12.15。阿里云也明确在维护这些版本，例如在 2026 年 8 月 10 日和 11 日，他们陆续推送了适用于 Debian 11.11、12.15 和 13.6 的三个 `.vhd` 镜像，修复了安装 `grub-cloud-amd64` 工具包后未创建 `/etc/grub.d/enable_cloud` 文件标记的问题，虽然零音也不知道这有什么用，但至少他们的确是在维护的。毕竟兜里没有💰，也只能苟于轻量应用服务器，所以零音打算就这样干了，先重置为 12.10，再升级到 13.7。当然不知道是不是镜像没有对这个地域、这个实例规格或者其他什么原因，但零音这里的确没有看到新版本 Debian。
+似乎在 ECS 云服务器上是可选 Debian 13 的，因为官方的 [动态与公告](https://www.alibabacloud.com/help/zh/ecs/debian) 里明确写了 Debian 13 版本，并且其 Debian 12 的版本也最高到 12.15。阿里云也明确在维护这些版本，例如在 2026 年 8 月 10 日和 11 日，他们陆续推送了适用于 Debian 11.11、12.15 和 13.6 的三个 `.vhd` 镜像，修复了安装 `grub-cloud-amd64` 工具包后未创建 `/etc/grub.d/enable_cloud` 文件标记的问题，虽然零音也不知道这有什么用，但至少他们的确是在维护的。毕竟兜里没有💰，也只能苟于轻量应用服务器，所以零音打算就这样干了，先重置为 12.10，再升级到 13.7。是不是镜像尚未向这个地域或实例规格开放，或者另有原因……但零音这里的确没有看到新版本 Debian。
 
-因为零音用 SSH 密钥登录服务器，重置完之后首先就吃了个大的（
+重置完之后，零音再次通过 SSH 连接服务器，首先就吃了个大的（
 
 ```text
 $ ssh [IP]
@@ -48,7 +48,7 @@ Host key verification failed.
 ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
-看看指纹和刚才提示的是否一致，如果一致就在本机删除和这个 IP 的旧记录
+看看指纹和刚才提示的是否一致，如果一致就在本机删除这个 IP 的旧记录
 
 ```bash
 ssh-keygen -R [IP]
@@ -56,14 +56,14 @@ ssh-keygen -R [IP]
 
 随后再次 SSH 就可以了。
 
-先在 bookworm 软件源下完成一轮更新：
+接下来的系统升级命令都在服务器的 root shell 中执行。先在 bookworm 软件源下完成一轮更新：
 
 ```bash
 apt update
 apt full-upgrade
 ```
 
-其中有一个镜像预装的神秘定制包 `cloud-init`，不在当时的 Debian repo 内，最初保留了 hold。雾雨帮忙审查了数据源配置与依赖模拟，最终 unhold 并让它随着 Debian repo 升级到 `25.1.4`。随后就可以开始升级 Debian 13 了，按照 Debian 发布说明建议，先换源：
+其中有一个镜像预装的神秘定制包 `cloud-init`，当时配置的 Debian 官方源中没有这个定制版本，所以最初保留了 hold。雾雨帮忙审查了数据源配置与依赖，确认可以改用 Debian 官方包。接下来切换到 trixie 源后再解除 hold，让它随 Debian 13 一起升级；最终安装的版本是 `25.1.4`。随后就可以开始升级 Debian 13 了，按照 Debian 发布说明建议，先换源：
 
 ```bash
 cat > /etc/apt/sources.list <<'EOF'
@@ -73,15 +73,18 @@ deb http://mirrors.cloud.aliyuncs.com/debian trixie-updates main
 EOF
 ```
 
-然后
+同时检查 `/etc/apt/sources.list.d/` 下的 `.list` 和 `.sources` 文件，处理残留的 bookworm 源、backports，以及不适用于 trixie 的第三方源，避免混用发行版。只覆盖 `/etc/apt/sources.list` 并不代表所有软件源都已经切换。
+
+然后更新索引、解除 `cloud-init` 的 hold，并检查候选版本与模拟升级结果：
 
 ```bash
 apt update
+apt-mark unhold cloud-init
 apt-cache policy cloud-init
 apt -s full-upgrade
 ```
 
-第三个命令是做模拟升级。感觉上没啥问题就可以正式升级了，分两阶段进行：
+最后一个命令是做模拟升级。感觉上没啥问题就可以正式升级了，分两阶段进行：
 
 ```bash
 apt upgrade --without-new-pkgs
@@ -100,7 +103,7 @@ systemctl --failed --no-pager
 
 看起来是没有一点问题了，重启！不出意外的话……
 
-### 什么叫更新进 BIOS 了？
+### 什么叫更新进 TianoCore UEFI 了？
 
 ![和雾雨的聊天记录。重启后 5 分钟 SSH 无法连接，雾雨建议零音去 VNC 控制台查看问题，零音发现 VNC 画面停留在 ECS 固件](./plan-tidelimit-01-debian-boxed-installation-media-and-stellaserver/fail-enter-os-chatlog.png)
 
@@ -135,7 +138,7 @@ error: file '/boot/grub/x86_64-efi/bli.mod' not found.
 
 ### 二战 Debian 13
 
-所以这到底是怎么回事？0 个人知道，所以就干脆重新重装了。安装 Debian 12，完成 bookworm 更新后，在重启之前，零音跑了
+所以这到底是怎么回事？0 个人知道，所以就干脆又重装了一次。安装 Debian 12，完成 bookworm 更新后，在重启之前，零音跑了
 
 ```bash
 grep -nE 'GRUB_(TERMINAL[^=]*|SERIAL_COMMAND|CMDLINE_LINUX[^=]*)=' \
@@ -248,7 +251,7 @@ fi
 ls: cannot access '/etc/grub.d/enable_cloud': No such file or directory
 ```
 
-草！！这个文件在阿里给的镜像里是缺失的，结果缺失之后直接 `exit 0` 静默退出了，APT 看不到问题就直接升级走了，`dpkg --audit` 也因此查不出问题，所以引导器安装直接因为这个跳过了。逗我呢，这是啥雷霆问题？！
+草！！这个文件在阿里给的镜像里是缺失的，结果脚本只输出了一条跳过安装的提示，就以状态码 0 退出了。APT 因此没有把它判为配置失败，`dpkg --audit` 也查不出引导文件是否正确刷新，所以引导器安装就这么被跳过了。逗我呢，这是啥雷霆问题？！
 
 然后，读者还记得前文零音提到的那个 ECS 更新日志吗，阿里云给 ECS 镜像修了这个问题，，，虽然不知道他们是没给轻量应用服务器推，还是说手动升级就是不在他们 fix 的修复范围内，总之，，哎懒得喷（
 
@@ -271,7 +274,7 @@ Installation finished. No error reported.
 
 `--no-nvram` 避免在这一步改动固件启动项；`--force-extra-removable` 还会维护可移动介质约定的回退启动位置。这里不是完全不写入：EFI 分区和 GRUB 模块都会被更新。另外，本机 `mokutil --sb-state` 返回不支持 Secure Boot。安装命令里的 `--uefi-secure-boot` 用于选择签名引导文件，不等于开启固件的 Secure Boot。
 
-再次切换 trixie 源，解除 `cloud-init` 的 hold，升级。这次似乎没啥问题了。记得我们前文说的吗？GRUB 也报告了 `bli.mod` 缺失的问题，不过我们走完这一轮手动 GRUB 之后，这些文件确实存在了：
+再次切换 trixie 源，解除 `cloud-init` 的 hold，升级。这次似乎没啥问题了。记得我们前文说的吗？GRUB 也报告了 `bli.mod` 缺失的问题。这次先在 Debian 12 上补标志并手动安装引导器，再完成 Debian 13 升级；升级完成后检查，这些文件确实存在了：
 
 ```console
 # ls -l /usr/lib/grub/x86_64-efi/bli.mod /boot/grub/x86_64-efi/bli.mod
@@ -487,7 +490,7 @@ sudo docker run --rm hello-world
 | `/etc/caddy/` | Caddy 配置 | 保留软件包原有位置 |
 | `/usr/local/sbin/` | 自己维护的系统管理脚本 | 如备份、维护脚本 |
 | `/etc/systemd/system/` | 自建服务、定时任务单元 | 定时执行用 systemd timer |
-| `/var/backups/stella/` | 本机备份暂存 | 后续上传 OSS 等异地位置 |
+| `/var/lib/stella-backup/current/` | 本机备份暂存工作区 | 仅 root 可访问，成功上传 OSS 后清理 |
 | `~` | 个人工作文件 | 临时下载、实验和日常操作 |
 
 ### Wakapi
@@ -547,7 +550,7 @@ sudoedit /srv/compose/wakapi/.env
 填入：
 
 ```bash
-WAKAPI_PUBLIC_URL=https://wakapi.example.com
+WAKAPI_PUBLIC_URL=https://wakapi.stellalyr.ink
 WAKAPI_PASSWORD_SALT=替换为随机值
 WAKAPI_COOKIE_KEY=替换为随机值
 WAKAPI_ALLOW_SIGNUP=false
@@ -668,7 +671,7 @@ sudoedit /etc/caddy/sites/wakapi.caddy
 写入：
 
 ```caddyfile
-wakapi.example.com {
+wakapi.stellalyr.ink {
     encode zstd gzip
     reverse_proxy 127.0.0.1:3000
 }
@@ -708,11 +711,11 @@ sudo docker compose \
   up -d
 ```
 
-注册账户后改回 `false`。拿到账户的 API Key，随后在开发用设备上改 `~/.wakatime.cfg`：
+注册账户后，将 `WAKAPI_ALLOW_SIGNUP` 改回 `false`，再次执行上面的 `docker compose … up -d`，让关闭注册的配置生效。只修改 `.env` 不会改变运行中容器的环境变量。拿到账户的 API Key，随后在开发用设备上改 `~/.wakatime.cfg`：
 
 ```ini
 [settings]
-api_url = https://wakapi.example.com/api
+api_url = https://wakapi.stellalyr.ink/api
 api_key = 你的_Wakapi_API_Key
 ```
 
@@ -795,7 +798,7 @@ sudo docker compose \
 ssh -N -L 15230:127.0.0.1:5230 stellaServer
 ```
 
-然后浏览器访问 `http://127.0.0.1:15230` 就可以直接访问到对应服务。配置好后接入 Caddy 就无后患了。
+然后浏览器访问 `http://127.0.0.1:15230` 就可以直接访问到对应服务。初始化完成后再接入 Caddy，至少可以避免在公网开放初始化页面时被人抢注管理员账户；后续的访问控制和安全更新还是得继续做好。
 
 ### CrystaRin 重新部署
 
@@ -970,7 +973,7 @@ RAM 这边没有直接上 `AliyunOSSFullAccess`，而是建了一条自定义策
 这里有两类完全不同的秘密，别混在一起想：
 
 1. OSS AccessKey：决定能不能碰到远端那些对象；
-2. Restic 仓库密码：决定能不能解开车库。
+2. Restic 仓库密码：决定能不能解开仓库。
 
 密码丢了，哪怕对象还在 OSS 里躺着，也恢复不出任何东西。所以密码和恢复所需的 OSS 凭据必须另存到服务器以外，不能把「备份里的那份凭据副本」当成唯一的恢复入口——那属于把开锁钥匙锁在保险箱里。
 
@@ -1033,7 +1036,7 @@ ROOT
 
 ### 脚本到底干了什么
 
-配套文件一共这么几个，分工很清楚：
+本机部署的文件一共这么几个，分工很清楚。本文只记录它们的职责和运行流程。下文的 `stella-backup` 命令和 systemd 单元都是本机自建的，不是安装 Restic 后就会自带的：
 
 | 文件 | 用途 |
 | --- | --- |
@@ -1080,15 +1083,14 @@ flowchart TD
 
 ### 先手动跑一遍
 
-解压附件，进入 `backup/` 目录后：
+在本机完成脚本和 systemd 单元的安装后，零音先手动启动备份任务并查看日志：
 
 ```bash
-sudo bash install.sh
 sudo systemctl start stella-backup@backup.service
 sudo journalctl -u stella-backup@backup.service -n 100 --no-pager
 ```
 
-安装器只安装文件和执行 `daemon-reload`，不会启用 timer。第一次备份通过之后，才轮到考虑自动化的事。
+安装时只部署文件和执行 `daemon-reload`，没有启用 timer。第一次备份通过之后，才轮到考虑自动化的事。
 
 实际的首次备份日志长这样：
 
@@ -1107,7 +1109,7 @@ Backup completed; application services have been restarted.
 
 任务在 19:30:26 开始，19:31:39 正常结束。开始停止应用的日志是 19:30:29，开始恢复应用是 19:30:35。
 
-日志里还有一条 `Flag --time has been deprecated, use --timeout instead`。这是当前配套版本用了 Docker 旧选项产生的弃用警告，本次执行依然成功；它既不是备份失败，也没必要装作没出现过。
+日志里还有一条 `Flag --time has been deprecated, use --timeout instead`。这是当时部署的脚本用了 Docker 旧选项产生的弃用警告，本次执行依然成功；它既不是备份失败，也没必要装作没出现过。
 
 另外，原始 PostgreSQL 目录大小不能直接和最终归档大小比较：这里做的是逻辑导出，不是逐字节上传 PGDATA。上面的「实际存储」只是本次 Restic 的输出，不代表未来的费用或压缩比。
 
