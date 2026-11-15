@@ -55,7 +55,23 @@ export const siteConfig: SiteConfig = {
 		"一只银河水母的部落格",
 
 	// 站点关键词
-	keywords: [],
+	keywords: [
+		"CrystaRin镜雨亭",
+		"LyCecilion",
+		"神楽坂 零音",
+		"个人博客",
+		"CTF",
+		"网络安全",
+		"逆向工程",
+		"漏洞分析",
+		"密码学",
+		"数学",
+		"Linux",
+		"Nix",
+		"服务器运维",
+		"本地大模型",
+		"生活随笔",
+	],
 
 	// 主题色
 	themeColor: {

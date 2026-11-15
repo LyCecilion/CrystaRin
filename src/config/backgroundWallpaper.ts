@@ -98,6 +98,42 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 					showName: false,
 				},
 				{
+					name: "Discord",
+					icon: "fa7-brands:discord",
+					url: "https://discord.com/users/1436655713119240253",
+					showName: false,
+				},
+				{
+					name: "Bluesky",
+					icon: "fa7-brands:bluesky",
+					url: "https://bsky.app/profile/stellalyr.ink",
+					showName: false
+				},
+				{
+					name: "Mastodon",
+					icon: "fa7-brands:mastodon",
+					url: "https://mastodon.social/@stellalyRin",
+					showName: false,
+				},
+				{
+					name: "哔哩哔哩",
+					icon: "fa7-brands:bilibili",
+					url: "https://space.bilibili.com/182330206",
+					showName: false
+				},
+				{
+					name: "知乎",
+					icon: "fa7-brands:zhihu",
+					url: "https://www.zhihu.com/people/nebudr1ft",
+					showName: false,
+				},
+				{
+					name: "QQ",
+					icon: "fa7-brands:qq",
+					url: "https://qm.qq.com/q/vbxx22dZm0",
+					showName: false,
+				},
+				{
 					name: "Email",
 					icon: "fa7-solid:envelope",
 					url: "mailto:LyCecilion@outlook.com",

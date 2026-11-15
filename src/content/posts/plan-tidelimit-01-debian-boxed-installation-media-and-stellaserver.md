@@ -5,6 +5,8 @@ description: "给 stellaServer 重装 Debian 13，结果一脚踩进 GRUB 的坑
 image: ./plan-tidelimit-01-debian-boxed-installation-media-and-stellaserver/debian.jpg
 tags: [Debian, 运维, GRUB, Caddy, Docker, Restic]
 category: Plan Tidelimit
+series: Plan Tidelimit
+seriesOrder: 1
 ---
 
 ![Debian???](./plan-tidelimit-01-debian-boxed-installation-media-and-stellaserver/debian.jpg)

@@ -9,7 +9,7 @@ export const sponsorConfig: SponsorConfig = {
 
 	// 打赏用途说明
 	usage:
-		"您的打赏将用于服务器维护、内容创作和功能开发，帮助我持续提供优质内容。",
+		"",
 
 	// 是否显示打赏者列表
 	showSponsorsList: true,
@@ -37,7 +37,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/wechat.png",
 			link: "",
 			description: "使用 微信 扫码打赏",
-			enabled: false,
+			enabled: true,
 		},
 		{
 			name: "ko-fi",
@@ -51,29 +51,12 @@ export const sponsorConfig: SponsorConfig = {
 			name: "爱发电",
 			icon: "simple-icons:afdian",
 			qrCode: "",
-			link: "https://ifdian.net/a/cuteleaf",
+			link: "https://ifdian.net/a/LyCecilion",
 			description: "通过 爱发电 进行打赏",
 			enabled: false,
 		},
 	],
 
 	// 打赏者列表（可选）
-	sponsors: [
-		// 示例：已实名打赏者
-		{
-			name: "夏叶",
-			avatar:
-				"https://weavatar.com/avatar/d252655d40d6874417a720bad0a6c5f77f8f6a1fd2f882f8f338402dc37e4190?s=640",
-			amount: "¥50",
-			date: "2025-10-01",
-		},
-
-		// 示例：匿名打赏者
-		{
-			name: "匿名用户",
-			// avatar: "",
-			amount: "¥20",
-			date: "2025-10-01",
-		},
-	],
+	sponsors: [],
 };

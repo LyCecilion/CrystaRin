@@ -15,6 +15,15 @@ export const galleryConfig: GalleryConfig = {
 		// password: 访问密码，设置后需要输入密码才能查看相册内容（可选）
 		// passwordHint: 密码提示，设置后在输入密码错误时显示（可选，需配合password使用）
 		// 每添加一个数组项就相当于添加了一个相册，记得在 public/gallery/ 目录下创建对应的子目录并放入图片
+		{
+			id: "ccisc-2026-finals",
+			name: "CCISC 2026 决赛见闻录",
+			description: "「赛场内外，旅途之间」：CCISC 2026 决赛与这个夏天的沿途见闻。",
+			date: "2026-08-28",
+			location: "南京, 西安",
+			tags: ["CCISC", "CTF", "旅行", "日常"],
+			cover: "/gallery/ccisc-2026-finals/005-com1.jpg",
+		},
 	],
 
 	// 瀑布流最小列宽(px)，浏览器根据容器宽度自动计算列数，默认 240
