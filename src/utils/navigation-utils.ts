@@ -1,4 +1,5 @@
 import { url } from "@/utils/url-utils";
+import { isNoiseBuild } from "@/utils/build-mode";
 /**
  * 导航工具函数
  * 提供统一的页面导航功能，支持 Swup 无刷新跳转
@@ -20,6 +21,16 @@ export function navigateToPage(
 	if (!url || typeof url !== "string") {
 		console.warn("navigateToPage: Invalid URL provided");
 		return;
+	}
+
+	if (isNoiseBuild) {
+		const destination = new URL(url, window.location.href);
+		if (
+			destination.origin === window.location.origin &&
+			destination.pathname !== window.location.pathname
+		) {
+			return;
+		}
 	}
 
 	// 如果是外部链接，直接跳转

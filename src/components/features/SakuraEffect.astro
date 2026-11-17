@@ -7,6 +7,7 @@
 <script>
 	import { sakuraConfig } from "@/config";
 	import type { SakuraConfig } from "@/types/effectsConfig";
+	import { isNoiseBuild } from "@/utils/build-mode";
 	import type {
 		SakuraManagerLike,
 		SakuraWorkerOutboundMessage,
@@ -538,7 +539,7 @@
 	// 守卫确保 Swup 切页重跑模块化脚本时不会重复初始化或重复注册监听器
 	// ===========================================================================
 	(function setupSakura() {
-		if (window.sakuraInitialized) {
+		if (isNoiseBuild || window.sakuraInitialized) {
 			return;
 		}
 		window.sakuraInitialized = true;

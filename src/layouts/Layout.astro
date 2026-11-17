@@ -38,6 +38,7 @@ import { getAuthorAvatarUrl, getSiteLogo } from "@/utils/schema-image";
 import { buildSiteGraph, toAbsoluteUrl } from "@/utils/schema-utils";
 import { getOgLocale } from "@/utils/site-config-utils";
 import { getCanonicalUrl, url } from "@/utils/url-utils";
+import { isNoiseBuild } from "@/utils/build-mode";
 
 import "@/styles/main.css";
 import "@/styles/immersive-reading.css";
@@ -130,7 +131,9 @@ const aboutUrl =
 const siteLogo = await getSiteLogo();
 
 // canonical：对 /archive/ 与 /search/ 剥离查询串，避免筛选视图自我 canonical 到 ?tag= 等
-const canonicalUrl = getCanonicalUrl(Astro.url);
+const canonicalUrl = isNoiseBuild
+	? (Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined)
+	: getCanonicalUrl(Astro.url);
 
 // OG 图片：文章走生成图/封面，非文章页回退到站点 logo
 let ogImageUrl: string | undefined;
@@ -156,9 +159,10 @@ const ogImageAlt = propsOgImageAlt ?? pageTitle;
 ---
 
 <!doctype html>
-<html lang={siteLang} class="bg-(--page-bg) text-[14px] md:text-[16px]" data-wallpaper-mode={backgroundWallpaper.mode} data-fullscreen-layout={fullscreenLayout} data-has-wallpaper={hasWallpaper ? "" : undefined} data-tag-style={siteConfig.tagStyle ?? "pill"} data-category-style={siteConfig.categoryStyle ?? "rectangle"}>
+<html lang={siteLang} class="bg-(--page-bg) text-[14px] md:text-[16px]" data-build={isNoiseBuild ? "noise" : undefined} data-wallpaper-mode={backgroundWallpaper.mode} data-fullscreen-layout={fullscreenLayout} data-has-wallpaper={hasWallpaper ? "" : undefined} data-tag-style={siteConfig.tagStyle ?? "pill"} data-category-style={siteConfig.categoryStyle ?? "rectangle"}>
   <head>
     <meta charset="UTF-8" />
+    {isNoiseBuild && <meta name="robots" content="noindex, nofollow" />}
     <style is:inline>
 			@layer properties, theme, base, components, utilities;
 		</style>
@@ -559,18 +563,18 @@ const ogImageAlt = propsOgImageAlt ?? pageTitle;
     <!-- 页面顶部渐变高光效果 - 只在full和semifull模式下显示 -->
     {shouldShowTopHighlight && <div class="top-gradient-highlight" />}
     <ConfigCarrier />
-    <MusicManager />
+    {!isNoiseBuild && <MusicManager />}
     <slot />
 
     <!-- 播放器视图脚本：必须在 <slot /> 之后（解析到它时所有 widget 的 DOM 要已存在），
          且在 MusicManager 之后（swup 重跑按文档顺序，window.__fireflyMusic 得先就位） -->
-    {(musicPlayerConfig.showInNavbar || musicPlayerConfig.showInSidebar !== false) && (
+    {!isNoiseBuild && (musicPlayerConfig.showInNavbar || musicPlayerConfig.showInSidebar !== false) && (
       <MusicPlayerView />
     )}
 
 
     <!-- Sakura Effect -->
-    <SakuraEffect />
+    {!isNoiseBuild && <SakuraEffect />}
 
     <!-- Water Waves Effect -->
     <WavesEffect />

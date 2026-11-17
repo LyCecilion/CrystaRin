@@ -58,7 +58,9 @@ if (process.env.NODE_ENV === "development") {
 	setMaxListeners(20);
 }
 
-const adapter = process.env.CF_WORKERS
+const isNoise = process.env.CRYSTARIN_BUILD === "noise";
+
+const adapter = !isNoise && process.env.CF_WORKERS
 	? cloudflare({
 			prerenderEnvironment: "node",
 		})
@@ -66,7 +68,12 @@ const adapter = process.env.CF_WORKERS
 
 // https://astro.build/config
 export default defineConfig({
-	site: siteConfig.site_url,
+	site: isNoise ? process.env.CRYSTARIN_NOISE_SITE : siteConfig.site_url,
+	...(isNoise ? {
+		srcDir: "./src-noise",
+		outDir: "./dist-noise",
+		cacheDir: "./.astro-noise",
+	} : {}),
 
 	base: "/",
 	trailingSlash: "always",
@@ -116,7 +123,7 @@ export default defineConfig({
 	},
 
 	integrations: [
-		swup({
+		...(!isNoise ? [swup({
 			theme: false,
 			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
 			// the default value `transition-` cause transition delay
@@ -146,7 +153,7 @@ export default defineConfig({
 				// 跳过锚点链接的处理，让浏览器原生处理
 				return event.state?.url?.includes("#");
 			},
-		}),
+		})] : []),
 		icon({
 			include: {
 				"material-symbols": ["*"],
@@ -233,7 +240,7 @@ export default defineConfig({
 			},
 		}),
 		svelte(),
-		sitemap({
+		...(!isNoise ? [sitemap({
 			filter: (page) => {
 				// 根据页面开关配置过滤sitemap
 				const url = new URL(page);
@@ -279,7 +286,7 @@ export default defineConfig({
 				}
 				return true;
 			},
-		}),
+		})] : []),
 		mdx(),
 	],
 	markdown: {
@@ -351,6 +358,9 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		define: {
+			"process.env.CRYSTARIN_BUILD": JSON.stringify(isNoise ? "noise" : "blog"),
+		},
 		server: {
 			watch: {
 				ignored: ["**/package/**", "**/Firefly-docs/**"],

@@ -1,11 +1,14 @@
 # build output
 dist/
+dist-noise/
+public/noise-scene/
 
 # generated vndb covers
 public/vndb-covers/
 
 # generated types
 .astro/
+.astro-noise/
 
 # dependencies
 node_modules/

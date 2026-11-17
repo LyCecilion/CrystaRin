@@ -8,8 +8,12 @@ import { spawnSync } from "node:child_process";
 import { resolveSiteRoot } from "./site-root";
 
 const siteRoot = resolveSiteRoot();
+const args = ["--site", siteRoot];
+if (process.env.CRYSTARIN_BUILD === "noise") {
+	args.push("--root-selector", "#post-list-container");
+}
 
-const result = spawnSync("pagefind", ["--site", siteRoot], {
+const result = spawnSync("pagefind", args, {
 	stdio: "inherit",
 	// Windows 下 .bin 里是 .cmd 包装，需要 shell 才能解析到
 	shell: process.platform === "win32",

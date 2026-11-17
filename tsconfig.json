@@ -42,9 +42,11 @@
   "include": [
     ".astro/types.d.ts",
     "src/**/*",
+    "src-noise/**/*",
     "scripts/**/*"
   ],
   "exclude": [
-    "dist"
+    "dist",
+    "dist-noise"
   ]
 }
