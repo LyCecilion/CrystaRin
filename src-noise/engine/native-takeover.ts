@@ -114,7 +114,13 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 
 	function requestPaint(): void {
 		if (!active && !pending) return;
-		try { canvas.requestPaint(); }
+		try {
+			const now = performance.now();
+			options.time = now / 1000;
+			// Mutate the live source BEFORE its paint/upload, never from a paint handler.
+			options.noise = performanceMode ? hooks.frame?.(now) : undefined;
+			if (active || pending) canvas.requestPaint();
+		}
 		catch (error) { exit(error instanceof Error ? error.message : "原生绘制失败，已恢复首页"); }
 	}
 
@@ -237,8 +243,6 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 				compositor.updateElement("viewport", viewport);
 				dirty = false;
 			}
-			options.time = performance.now() / 1000;
-			options.noise = performanceMode ? hooks.frame?.(performance.now()) : undefined;
 			if (!compositor || (!active && !pending)) return;
 			compositor.render(rectangles, options);
 			hold.hidden = true;

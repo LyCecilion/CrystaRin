@@ -7,8 +7,12 @@ interface PathPosition extends TimedPointerPosition { stamp: number }
 
 /** Records input independently of paint. One physical cursor, no virtual trail
  * fingers. Audio-clock interpolation aligns coalesced events to animated areas;
- * the three-second carry uses wall time, including while audio is buffering. */
-export function createPointerInfection(): {
+ * the three-second carry uses wall time, including while audio is buffering.
+ * Optional deposition uses displayed viewport coordinates, never bridges excluded
+ * input, and reports a conservative end-of-portion strength for carried travel. */
+export function createPointerInfection(
+	deposit?: (fromX: number, fromY: number, toX: number, toY: number, strength: number) => void,
+): {
 	readonly pointer: PointerVisual & { allowed: boolean };
 	move(x: number, y: number, stamp: number, allowed: boolean, tracking: boolean): void;
 	leave(stamp: number, tracking: boolean): void;
@@ -61,8 +65,41 @@ export function createPointerInfection(): {
 					time: anchor.time + (songTime - anchor.time) * u,
 				};
 				const from = previous ?? point;
-				const hit = lastBlockedOnPath(chart, from, point, stage.width, stage.height);
-				if (hit !== null) until = Math.max(until, from.stamp + (point.stamp - from.stamp) * hit + 3000);
+				if (!deposit) {
+					const hit = lastBlockedOnPath(chart, from, point, stage.width, stage.height);
+					if (hit !== null) until = Math.max(until, from.stamp + (point.stamp - from.stamp) * hit + 3000);
+				} else {
+					const dt = point.stamp - from.stamp;
+					const dx = point.x - from.x;
+					const dy = point.y - from.y;
+					const emit = (lo: number, hi: number, strength: number): void => {
+						deposit(from.x + dx * lo + stage.left, from.y + dy * lo + stage.top,
+							from.x + dx * hi + stage.left, from.y + dy * hi + stage.top, strength);
+					};
+					const carried = (lo: number, hi: number): void => {
+						if (until <= from.stamp + dt * lo) return;
+						// The expiry itself has zero strength. End just inside its finite,
+						// open bound; subdivide fading travel so one late frame cannot
+						// assign an almost-zero level to its entire three-second path.
+						if (dt > 0) hi = Math.min(hi, (until - from.stamp) / dt - 1e-12);
+						if (hi < lo) return;
+						const count = Math.max(1, Math.ceil(dt * (hi - lo) / 300));
+						for (let i = 0; i < count; i++) {
+							const a = lo + (hi - lo) * i / count;
+							const b = lo + (hi - lo) * (i + 1) / count;
+							const strength = Math.min(1, (until - from.stamp - dt * b) / 3000);
+							if (strength > 0) emit(a, b, strength);
+						}
+					};
+					let cursor = 0;
+					lastBlockedOnPath(chart, from, point, stage.width, stage.height, (lo, hi) => {
+						if (lo > cursor) carried(cursor, lo);
+						emit(lo, hi, 1);
+						until = Math.max(until, from.stamp + dt * hi + 3000);
+						cursor = hi;
+					});
+					if (cursor < 1) carried(cursor, 1);
+				}
 				previous = point;
 			}
 			for (const point of pending) visit(point.x, point.y, point.stamp, point.allowed);

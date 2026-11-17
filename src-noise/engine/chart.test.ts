@@ -137,3 +137,42 @@ test("letterbox contacts cannot infect and first enabled endpoint can", () => {
 	assert.equal(lastBlockedOnPath(data, { x: -200, y: 500, time: 1 }, { x: -100, y: 500, time: 1.02 }, 1000, 1000), null);
 	assert.equal(lastBlockedOnPath(data, { x: 500, y: 500, time: 0.99 }, { x: 500, y: 500, time: 1 }, 1000, 1000), 1);
 });
+
+test("blocked visitor reports chronological inset intervals without changing the last hit", () => {
+	const data = chart([block()]);
+	const from = { x: 100, y: 500, time: 1 };
+	const to = { x: 900, y: 500, time: 1.02 };
+	const intervals: [number, number][] = [];
+	const last = lastBlockedOnPath(data, from, to, 1000, 1000, (lo, hi) => intervals.push([lo, hi]));
+	assert.ok(intervals.length > 0);
+	close(intervals[0][0], 0.4375);
+	close(intervals.at(-1)![1], 0.5625);
+	close(last!, lastBlockedOnPath(data, from, to, 1000, 1000)!);
+	for (let i = 0; i < intervals.length; i++) {
+		assert.ok(intervals[i][0] <= intervals[i][1]);
+		if (i) assert.ok(intervals[i][0] >= intervals[i - 1][1]);
+	}
+});
+
+test("blocked visitor preserves Subtract gaps and authored lifecycle offsets", () => {
+	const data = chart([
+		block({ bottomLeftPercentage: { x: 0.1, y: 0.1 }, topRightPercentage: { x: 0.9, y: 0.9 }, enableTime: 0.004, disableTime: 0.016 }),
+		block({ isSubtract: true, enableTime: 0.004, disableTime: 0.016 }),
+	], [], 2);
+	const intervals: [number, number][] = [];
+	lastBlockedOnPath(data, { x: 100, y: 500, time: 2 }, { x: 900, y: 500, time: 2.02 },
+		1000, 1000, (lo, hi) => intervals.push([lo, hi]));
+	assert.ok(intervals.some(([, hi]) => hi < 0.5));
+	assert.ok(intervals.some(([lo]) => lo > 0.5));
+	assert.ok(intervals.every(([lo, hi]) => lo >= 0.2 - 1e-10 && hi <= 0.8 + 1e-10
+		&& (hi <= 0.3125 + 1e-10 || lo >= 0.6875 - 1e-10)));
+});
+
+test("blocked visitor reports an isolated first-enabled endpoint", () => {
+	const intervals: [number, number][] = [];
+	const hit = lastBlockedOnPath(chart([block({ enableTime: 1 })]),
+		{ x: 500, y: 500, time: 0.99 }, { x: 500, y: 500, time: 1 },
+		1000, 1000, (lo, hi) => intervals.push([lo, hi]));
+	assert.equal(hit, 1);
+	assert.deepEqual(intervals, [[1, 1]]);
+});

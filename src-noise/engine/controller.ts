@@ -9,6 +9,7 @@ import type { PhiraTouch } from "./phira-types";
 import { mountSceneTakeover } from "./scene-takeover";
 import { mountNativeTakeover } from "./native-takeover";
 import { createPointerInfection } from "./pointer-infection";
+import { mountDomContamination } from "./dom-contamination";
 import type { Stage } from "./types";
 import { createPostFxState, postFxOverscan } from "./postfx-settings";
 import { mountPostFxControls } from "./postfx-controls";
@@ -68,7 +69,15 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	const inputStage: Stage = { left: 0, top: 0, width: 0, height: 0 };
 	let presentationScale = 1;
 	let allowed = false;
-	const infection = createPointerInfection();
+	const contamination = mountDomContamination();
+	const infection = createPointerInfection((fromX, fromY, toX, toY, strength) => {
+		contamination.infectPath(
+			unprojectPresentation(fromX, innerWidth, presentationScale),
+			unprojectPresentation(fromY, innerHeight, presentationScale),
+			unprojectPresentation(toX, innerWidth, presentationScale),
+			unprojectPresentation(toY, innerHeight, presentationScale), strength,
+		);
+	});
 	let lastUiUpdate = 0;
 	const pointer = infection.pointer;
 	const touch: PhiraTouch = { id: 0, x: 0, y: 0, strength: 0 };
@@ -88,6 +97,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		notes: notesState,
 		onEnter() { setIntro(false); launch.hidden = true; },
 		onExit(withMusic, reason) {
+			contamination.reset();
 			if (withMusic && (entered || starting)) stop();
 			launch.hidden = false;
 			launch.focus({ preventScroll: true });
@@ -209,7 +219,9 @@ export function mountNoiseExperience(root: HTMLElement): void {
 			const now = nowMs / 1000;
 			const songTime = audio.element.currentTime;
 			const sampled = sampleChart(chart, songTime, stage.width, stage.height);
+			contamination.prepare();
 			infection.sample(chart, inputStage, songTime, nowMs, playing);
+			contamination.sample(sampled.areas, stage, songTime, playing);
 			audio.setPollution(pointer.strength);
 			touches.length = 0;
 			if (pointer.present && pointer.allowed && pointer.strength > 0) {
@@ -239,7 +251,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		start.disabled = true;
 		const version = ++playVersion;
 		try {
-			if (audio.element.ended) audio.seek(0);
+			if (audio.element.ended) { contamination.reset(); audio.seek(0); }
 			await audio.play();
 			if (disposed || version !== playVersion) return;
 			if (!allowed || document.hidden) { audio.pause(); return; }
@@ -311,10 +323,10 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	launch.addEventListener("click", () => setIntro(true), { signal });
 	toggle.addEventListener("click", () => { if (playing) pause(); else void play(); }, { signal });
 	exit.addEventListener("click", stop, { signal });
-	restart.addEventListener("click", () => { resetPollution(); audio.seek(0); syncUi(); }, { signal });
+	restart.addEventListener("click", () => { resetPollution(); contamination.reset(); audio.seek(0); syncUi(); }, { signal });
 	mute.addEventListener("click", () => { audio.element.muted = !audio.element.muted; syncUi(); }, { signal });
 	notesButton.addEventListener("click", () => { void toggleNotes(); }, { signal });
-	seek.addEventListener("input", () => { resetPollution(); audio.seek(Number(seek.value) / 100 * audio.element.duration); syncUi(); }, { signal });
+	seek.addEventListener("input", () => { resetPollution(); contamination.reset(); audio.seek(Number(seek.value) / 100 * audio.element.duration); syncUi(); }, { signal });
 	window.addEventListener("resize", resize, { signal, passive: true });
 	root.addEventListener("noise-postfx-change", syncPresentation, { signal });
 	window.addEventListener("blur", () => infection.leave(performance.now(), playing), { signal });
@@ -357,6 +369,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		listeners.abort();
 		scene.dispose();
 		native.dispose();
+		contamination.dispose();
 		postfxControls.dispose();
 		setIntro(false);
 		audio.dispose();

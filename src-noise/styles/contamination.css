@@ -1,0 +1,57 @@
+/* GPL-3.0-only. Paint patches do not alter source layout or hit testing. */
+[data-noise-dom-overlay] {
+	position: absolute;
+	inset: 0;
+	z-index: 100;
+	pointer-events: none !important;
+	overflow: hidden;
+}
+[data-noise-dom-patch] {
+	position: absolute;
+	pointer-events: none !important;
+	box-sizing: border-box;
+	overflow: hidden;
+	contain: layout paint;
+}
+[data-noise-dom-paint] {
+	position: absolute !important;
+	inset: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	max-width: none !important;
+	margin: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	animation: none !important;
+	transition: none !important;
+	pointer-events: none !important;
+}
+[data-noise-dom-paint]::before, [data-noise-dom-paint]::after { content: none !important; }
+[data-noise-dom-patch="text"] {
+	opacity: calc(var(--noise-dom-level) * .95);
+}
+[data-noise-dom-patch="text"] > [data-noise-dom-paint] {
+	transform: translate(calc(var(--noise-dom-level) * 12px), calc(var(--noise-dom-level) * -1.5px)) !important;
+	text-shadow: -4px 0 #44d8e6, 3px 0 #f35b98;
+}
+[data-noise-dom-patch="image"] {
+	opacity: calc(var(--noise-dom-level) * .95);
+}
+[data-noise-dom-patch="image"] > [data-noise-dom-paint] {
+	transform: translate(calc(var(--noise-dom-level) * 16px), calc(var(--noise-dom-level) * 2px)) !important;
+	filter: grayscale(1) saturate(.15) contrast(1.45);
+}
+[data-noise-dom-patch="image"]::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: repeating-linear-gradient(0deg, transparent 0 5px, #a0e3ecaa 5px 6px, #e2578c66 6px 7px);
+	opacity: calc(var(--noise-dom-level) * .8);
+}
+[data-noise-dom-patch="card"] {
+	opacity: calc(var(--noise-dom-level) * .85);
+	border: 2px solid #78dce5;
+	box-shadow: inset 0 0 16px #ed71acbb, inset 0 0 3px #f39bcb;
+}

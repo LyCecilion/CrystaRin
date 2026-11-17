@@ -331,10 +331,12 @@ export interface TimedPointerPosition {
 /** Last contact along a recorded segment; normal/inverse inset and parity are
  * evaluated together, not as independent rectangle hits. Linear translation at
  * fixed rotation/scale is swept analytically. Curved transforms are subdivided
- * at keyframes and at most 1/240 s, with extra rotation subdivisions. */
+ * at keyframes and at most 1/240 s, with extra rotation subdivisions.
+ * An optional visitor receives blocked fractions in chronological order, including
+ * isolated contacts as zero-length intervals; without it traversal stops at the last hit. */
 export function lastBlockedOnPath(
 	chart: NoiseChart, from: TimedPointerPosition, to: TimedPointerPosition,
-	width: number, height: number,
+	width: number, height: number, visitBlocked?: (start: number, end: number) => void,
 ): number | null {
 	const start = from.time - chart.offset;
 	const duration = to.time - from.time;
@@ -385,7 +387,9 @@ export function lastBlockedOnPath(
 		if (clip(ahx - ax, bhx - bx) && clip(ahx + ax, bhx + bx)
 			&& clip(ahy - ay, bhy - by) && clip(ahy + ay, bhy + by)) cuts.push(lo, hi);
 	}
-	for (let i = times.length - 1; i > 0; i--) {
+	let last: number | null = null;
+	for (let index = 1; index < times.length; index++) {
+		const i = visitBlocked ? index : times.length - index;
 		const low = times[i - 1];
 		const high = times[i];
 		if (high <= low) continue;
@@ -397,10 +401,11 @@ export function lastBlockedOnPath(
 			const b = sampleBlock(block, start + duration * beforeHigh, width, height);
 			steps = Math.max(steps, Math.ceil(Math.abs(b.rotation - a.rotation) / radians));
 		}
-		for (let step = steps - 1; step >= 0; step--) {
+		for (let index = 0; index < steps; index++) {
+			const step = visitBlocked ? index : steps - 1 - index;
 			const a = low + (high - low) * step / steps;
 			const b = low + (high - low) * (step + 1) / steps;
-			if (inside(b)) return b;
+			if (!visitBlocked && inside(b)) return b;
 			const end = b - Math.min((b - a) * 1e-7, 1e-7);
 			const at = start + duration * a;
 			const bt = start + duration * end;
@@ -426,13 +431,29 @@ export function lastBlockedOnPath(
 				}
 			}
 			cuts.sort((x, y) => x - y);
-			for (let j = cuts.length - 1; j >= 0; j--) {
-				const u = a + (b - a) * cuts[j];
-				if (inside(u)) return u;
-				if (j && inside(a + (b - a) * (cuts[j - 1] + cuts[j]) / 2)) return u;
+			if (visitBlocked) {
+				if (inside(a)) { visitBlocked(a, a); last = a; }
+				for (let j = 1; j < cuts.length; j++) {
+					const lo = a + (b - a) * cuts[j - 1];
+					const hi = a + (b - a) * cuts[j];
+					if (hi <= lo) continue;
+					if (inside((lo + hi) / 2)) {
+						visitBlocked(lo, hi);
+						last = hi;
+					} else if (inside(hi)) {
+						visitBlocked(hi, hi);
+						last = hi;
+					}
+				}
+			} else {
+				for (let j = cuts.length - 1; j >= 0; j--) {
+					const u = a + (b - a) * cuts[j];
+					if (inside(u)) return u;
+					if (j && inside(a + (b - a) * (cuts[j - 1] + cuts[j]) / 2)) return u;
+				}
 			}
 		}
 	}
-	return null;
+	return last;
 }
 

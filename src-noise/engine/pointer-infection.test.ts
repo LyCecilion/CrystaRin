@@ -92,3 +92,105 @@ test("stage-local coordinates and event-time audio interpolation catch transient
 	input.move(1000, 700, 1010, true, true);
 	assert.ok(input.sample(transient, insetStage, 2.02, 1020, true) > 0.99);
 });
+
+type Deposit = [number, number, number, number, number];
+function recording() {
+	const paths: Deposit[] = [];
+	return { input: createPointerInfection((...path) => paths.push(path)), paths };
+}
+
+test("deposition begins at first inset contact, in displayed viewport coordinates", () => {
+	const { input, paths } = recording();
+	const shifted = { ...stage, left: 100, top: 200 };
+	input.move(200, 700, 0, true, true);
+	input.sample(data, shifted, 1, 0, true);
+	assert.equal(paths.length, 0);
+	input.move(1000, 700, 10, true, true);
+	input.sample(data, shifted, 1.01, 10, true);
+	assert.ok(paths.length > 0);
+	assert.ok(Math.abs(paths[0][0] - 550) < 1e-5);
+	assert.ok(paths.every(([fx, fy, tx, ty, s]) => fx >= 550 - 1e-5 && tx >= fx && fy === 700 && ty === 700 && s > 0 && s <= 1));
+	assert.ok(paths.some(([fx, , tx]) => fx <= 900 && tx >= 900), "carried travel crosses a target between paints");
+});
+
+test("deposition follows every recorded bend rather than shortcutting", () => {
+	const { input, paths } = recording();
+	input.move(500, 500, 0, true, true);
+	input.sample(data, stage, 1, 0, true);
+	paths.length = 0;
+	input.move(500, 100, 10, true, true);
+	input.move(900, 100, 20, true, true);
+	input.move(900, 500, 30, true, true);
+	input.sample(data, stage, 1.03, 30, true);
+	assert.ok(paths.some(([fx, fy, tx, ty]) => fy === 100 && ty === 100 && fx <= 700 && tx >= 700));
+	assert.ok(paths.every(([fx, fy, tx, ty]) => fx === tx || fy === ty));
+});
+
+test("late deposition clips at actual carry expiry with finite positive fading strength", () => {
+	const { input, paths } = recording();
+	input.move(500, 500, 0, true, true);
+	input.sample(data, stage, 1, 0, true);
+	input.move(900, 500, 100, true, true);
+	input.sample(data, stage, 1.1, 100, true);
+	const expiry = 3012.5;
+	paths.length = 0;
+	input.move(900, 900, 6100, true, true);
+	assert.equal(input.sample(data, stage, 7.1, 6100, true), 0);
+	const limit = 500 + 400 * (expiry - 100) / 6000;
+	assert.ok(paths.length > 1);
+	assert.ok(paths.every(([, , , ty, s]) => ty < limit && Number.isFinite(s) && s > 0 && s <= 1));
+	assert.ok(Math.abs(paths.at(-1)![3] - limit) < 1e-5);
+	assert.ok(paths[0][4] > paths.at(-1)![4]);
+});
+
+test("clean excluded UI and reentry never bridge, and pause never deposits", () => {
+	for (const leave of [false, true]) {
+		const { input, paths } = recording();
+		input.move(100, 500, 0, true, true);
+		input.sample(data, stage, 1, 0, true);
+		if (leave) input.leave(1, true);
+		else input.move(500, 500, 1, false, true);
+		input.move(900, 500, 2, true, true);
+		input.sample(data, stage, 1.003, 3, true);
+		assert.equal(paths.length, 0);
+		input.move(500, 500, 4, true, true);
+		input.sample(data, stage, 1.004, 4, false);
+		assert.equal(paths.length, 0);
+	}
+});
+
+test("infected UI breaks retain carry without painting the excluded bridge", () => {
+	const { input, paths } = recording();
+	input.move(500, 500, 0, true, true);
+	input.sample(data, stage, 1, 0, true);
+	paths.length = 0;
+	input.move(600, 100, 1, false, true);
+	input.move(900, 900, 2, true, true);
+	input.sample(data, stage, 1.003, 3, true);
+	assert.ok(paths.length > 0);
+	assert.ok(paths.every(([fx, fy, tx, ty]) => fx === 900 && tx === 900 && fy === 900 && ty === 900));
+});
+
+test("Subtract holes and inactive lifetimes cannot acquire deposition", () => {
+	const hole = prepareChart({ formatVersion: 3, offset: 2, judgeLineList: [], blockAreaList: [{
+		bottomLeftPercentage: { x: 0.1, y: 0.1 }, topRightPercentage: { x: 0.9, y: 0.9 },
+		appearTime: 0, enableTime: 0.004, disableTime: 0.006, disappearTime: 1,
+	}, {
+		bottomLeftPercentage: { x: 0.4, y: 0.4 }, topRightPercentage: { x: 0.6, y: 0.6 },
+		appearTime: 0, enableTime: 0.004, disableTime: 0.006, disappearTime: 1, isSubtract: true,
+	}] });
+	const { input, paths } = recording();
+	input.move(500, 500, 0, true, true);
+	input.sample(hole, stage, 2, 0, true);
+	input.sample(hole, stage, 2.01, 10, true);
+	assert.equal(paths.length, 0);
+	input.move(200, 500, 11, true, true);
+	input.sample(hole, stage, 2.011, 11, true);
+	assert.equal(paths.length, 0, "normal field is no longer active");
+	input.reset();
+	input.move(200, 500, 20, true, true);
+	input.sample(hole, stage, 2, 20, true);
+	input.sample(hole, stage, 2.01, 30, true);
+	assert.ok(paths.length > 0, "stationary pointer acquires only during the short active lifetime");
+	assert.ok(paths.every(([fx, fy, tx, ty]) => fx === 200 && tx === 200 && fy === 500 && ty === 500));
+});
