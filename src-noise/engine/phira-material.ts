@@ -53,7 +53,6 @@ export function loadPhiraAssets(): Promise<PhiraAssets> {
 
 const vertexSource = `#version 300 es
 layout(location = 0) in vec2 position;
-uniform vec2 screenSize;
 out lowp vec4 color;
 out highp vec2 fieldUV;
 out highp vec2 sceneUV;
@@ -63,7 +62,6 @@ out highp vec2 disabledDisplaceUV;
 out highp vec2 touchDisplaceUV;
 out highp vec2 noiseUV;
 out highp vec4 screenPos;
-out highp float clipHalfWidth;
 void main() {
  gl_Position = vec4(position * 2.0 - 1.0, 0.0, 1.0);
  color = vec4(1.0);
@@ -75,7 +73,6 @@ void main() {
  disabledDisplaceUV = sceneUV * vec2(0.5, 0.2);
  touchDisplaceUV = sceneUV * vec2(0.55, 0.3);
  noiseUV = sceneUV * vec2(1.5, 1.46);
- clipHalfWidth = screenSize.y * 0.888888896 / screenSize.x;
 }`;
 
 const floats: Record<string, number> = {
@@ -267,10 +264,15 @@ void main(){color=vec4(vec3(1.0,0.88,0.53)*opacity,opacity);}`));
 				gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 				gl.viewport(0, 0, w, h);
 				gl.enable(gl.BLEND);
+				// The fragment mask uses bottom-up UVs; the adaptive stage is in CSS pixels.
+				const clipLeft = frame.stage.left / width;
+				const clipBottom = 1 - (frame.stage.top + frame.stage.height) / height;
+				const clipRight = (frame.stage.left + frame.stage.width) / width;
+				const clipTop = 1 - frame.stage.top / height;
 				function draw(material: typeof active) {
 					gl.useProgram(material.p);
 					const u = material.uniform;
-					gl.uniform2f(u("screenSize"), w, h);
+					gl.uniform4f(u("uStageClip"), clipLeft, clipBottom, clipRight, clipTop);
 					gl.uniform4f(u("uUnityTime"), frame.time / 20, frame.time, frame.time * 2, frame.time * 3);
 					gl.uniform4f(u("_ScreenParams"), w, h, 1 + 1 / w, 1 + 1 / h);
 					gl.uniform4f(u("_EffectRT_TexelSize"), 1 / m.width, 1 / m.height, m.width, m.height);

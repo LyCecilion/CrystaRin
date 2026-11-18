@@ -16,6 +16,7 @@
     "test:noise": "tsx --test src-noise/engine/*.test.ts",
     "test:noise-grid": "node scripts/check-noise-grid.mjs",
     "test:noise-dom": "node scripts/check-noise-dom.mjs",
+    "test:noise-stage": "node scripts/check-noise-stage.mjs",
     "capture:noise": "node scripts/capture-noise-layers.mjs",
     "preview": "astro preview",
     "preview:noise": "node scripts/noise.mjs preview",

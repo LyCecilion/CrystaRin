@@ -12,7 +12,7 @@ varying highp vec2 disabledDisplaceUV;
 varying highp vec2 touchDisplaceUV;
 varying highp vec2 noiseUV;
 varying highp vec4 screenPos;
-varying highp float clipHalfWidth;
+uniform highp vec4 uStageClip;
 uniform int uLayer;
 uniform int uColored;
 uniform float uReadyExtra;
@@ -179,10 +179,6 @@ vec4 fullActive() {
     vec3 rgb = uColored == 0 ? vec3(1.0, 84.0 / 255.0, 84.0 / 255.0) : texture2D(uActiveColors, fieldUV).rgb;
     vec4 result;
 
-    u_xlat0.x = fieldUV.x + -0.5;
-    u_xlat0.x = -abs(u_xlat0.x) + clipHalfWidth;
-    u_xlatb0.x = u_xlat0.x<0.0;
-    if(u_xlatb0.x){discard;}
     u_xlat16_0 = composeSample(fieldUV);
     u_xlat16.xy = fieldUV.xy * _EffectRT_TexelSize.zw;
     u_xlat16.xy = floor(u_xlat16.xy);
@@ -578,6 +574,8 @@ vec4 snapshotSample(vec2 uv) {
     return texture2D(uScene, uv);
 }
 void main() {
+    // Web viewport adaptation replaces the native fixed 16:9 clip for every layer.
+    if (any(lessThan(fieldUV, uStageClip.xy)) || any(greaterThanEqual(fieldUV, uStageClip.zw))) discard;
     // uMasks RGBA=(active Compose, Edge, Glow, disabled Compose).
     // uAuxMasks RGB=(ready-only Normal.r, ready-only Subtract.g, composedDisabled.r),
     // A=hover mask in SCREEN UV, independently of the chart model's flips.

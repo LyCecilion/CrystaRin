@@ -70,7 +70,9 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	let presentationScale = 1;
 	let allowed = false;
 	const contamination = mountDomContamination();
+	let domContaminationActive = false;
 	const infection = createPointerInfection((fromX, fromY, toX, toY, strength) => {
+		if (!domContaminationActive) return;
 		contamination.infectPath(
 			unprojectPresentation(fromX, innerWidth, presentationScale),
 			unprojectPresentation(fromY, innerHeight, presentationScale),
@@ -219,9 +221,9 @@ export function mountNoiseExperience(root: HTMLElement): void {
 			const now = nowMs / 1000;
 			const songTime = audio.element.currentTime;
 			const sampled = sampleChart(chart, songTime, stage.width, stage.height);
-			contamination.prepare();
+			domContaminationActive = contamination.prepare(songTime);
 			infection.sample(chart, inputStage, songTime, nowMs, playing);
-			contamination.sample(sampled.areas, stage, songTime, playing);
+			if (domContaminationActive) contamination.sample(sampled.areas, stage, songTime, playing, pointer);
 			audio.setPollution(pointer.strength);
 			touches.length = 0;
 			if (pointer.present && pointer.allowed && pointer.strength > 0) {
