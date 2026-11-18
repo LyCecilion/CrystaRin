@@ -39,6 +39,12 @@ Anyone redistributing the combined noise application must preserve applicable
 copyright/license notices and satisfy GPLv3's Corresponding Source requirements;
 shipping only generated/minified JavaScript is not a replacement for source.
 
+The SIGNAL difficulty-escalation prologue uses the unmodified minimal renderer,
+default settings, Saira font and original intro audio from SIGNAL Replica by
+Lylighte. See signal/NOTICE.txt, signal/LICENSE and signal/assets/OFL.txt.
+Built distributions include SIGNAL-LICENSE, SIGNAL-NOTICE and SIGNAL-FONT-LICENSE.
+The MIT renderer license does not independently clear the intro audio rights.
+
 This code license does not grant rights to third-party music, charts, original
 game textures, blog posts, photographs, or other content. Desultory Signals music
 and chart data and the supplied block-area textures retain their respective

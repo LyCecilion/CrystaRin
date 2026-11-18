@@ -101,7 +101,7 @@ const colors: Record<string, number[]> = {
 };
 
 export interface PhiraMaterial {
-	render(framebuffer: WebGLFramebuffer, width: number, height: number, dpr: number, frame: PhiraFrame, noteRenderer?: NoteRenderer): void;
+	render(framebuffer: WebGLFramebuffer | null, width: number, height: number, dpr: number, frame: PhiraFrame, noteRenderer?: NoteRenderer): void;
 	dispose(): void;
 }
 

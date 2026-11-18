@@ -1,0 +1,32 @@
+---
+import PostPage from "@/components/layout/PostPage.astro";
+import NoiseExperience from "./NoiseExperience.astro";
+import { siteConfig } from "@/config";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import { getSortedPosts } from "@/utils/content-utils";
+import "@/styles/banner-home.css";
+
+const posts = await getSortedPosts();
+const page = { data: posts.slice(0, siteConfig.pagination.postsPerPage) };
+---
+
+<MainGridLayout heading={siteConfig.title}>
+  <PostPage page={page} />
+  <NoiseExperience />
+</MainGridLayout>
+
+<script>
+  // Preserve local controls and external links without leaving the current stage.
+  function stayOnStage(event: MouseEvent) {
+    const target = event.target;
+    const anchor = target instanceof Element ? target.closest("a[href]") : null;
+    if (!(anchor instanceof HTMLAnchorElement) || anchor.hasAttribute("download")) return;
+    const destination = new URL(anchor.href);
+    if (destination.origin === location.origin && destination.pathname !== location.pathname) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }
+  document.addEventListener("click", stayOnStage, true);
+  document.addEventListener("auxclick", stayOnStage, true);
+</script>

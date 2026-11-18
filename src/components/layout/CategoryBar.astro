@@ -4,6 +4,7 @@ import { i18n } from "@i18n/translation";
 import { Icon } from "astro-icon/components";
 import { getCategoryList, getSortedPostsList } from "@/utils/content-utils";
 import { url } from "@/utils/url-utils";
+import { isHomePage } from "@/utils/layout-utils";
 
 interface Props {
 	currentPostCategory?: string;
@@ -20,9 +21,8 @@ const archiveUrl = url("/archive/");
 // 查询串筛选（?category=/?tag=/?uncategorized）在静态页构建期不可知，
 // 交由客户端脚本在加载/导航时同步；此处只处理路径可确定的情况。
 const pathname = Astro.url.pathname.replace(/\/$/, "");
-const homePath = homeUrl.replace(/\/$/, "");
 const archivePath = archiveUrl.replace(/\/$/, "");
-const isHome = pathname === homePath || pathname === "" || pathname === "/";
+const isHome = isHomePage(Astro.url.pathname);
 const isCategories = pathname === "/categories";
 const isArchive = pathname === archivePath;
 const postCategory = (currentPostCategory || "").trim();
@@ -44,7 +44,6 @@ function initialActive(categoryName: string): {
 <div
   class="card-base category-bar p-3 onload-animation"
   id="category-bar"
-  data-home-path={homeUrl}
   data-archive-path={archiveUrl}
   data-current-post-category={currentPostCategory || ""}
 >
@@ -168,13 +167,13 @@ function initialActive(categoryName: string): {
 </style>
 
 <script>
+  import { isHomePage } from "@/utils/layout-utils";
   let delayedCategoryBarScrollTimer: number | undefined;
 
   function getCategoryBarState(bar: HTMLElement, currentUrl: URL) {
     const pathname = currentUrl.pathname.replace(/\/$/, "");
-    const homePath = (bar.getAttribute("data-home-path") || "/").replace(/\/$/, "");
     const archivePath = (bar.getAttribute("data-archive-path") || "/archive").replace(/\/$/, "");
-    const isHome = pathname === homePath || pathname === "" || pathname === "/";
+    const isHome = isHomePage(currentUrl.pathname);
     const isArchive = pathname === archivePath;
     const isCategories = pathname === "/categories";
 

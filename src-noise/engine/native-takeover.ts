@@ -10,6 +10,9 @@ import type { NotePerformanceState } from "./note-types";
 export interface NativeTakeover {
 	readonly active: boolean;
 	enter(withMusic?: boolean): Promise<boolean>;
+	setRunning(running: boolean): void;
+	/** Resolve only after a fresh frame has presented the requested scene mode. */
+	present(effect: boolean): Promise<void>;
 	exit(reason?: string): void;
 	dispose(): void;
 }
@@ -63,6 +66,7 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 	let active = false;
 	let pending = false;
 	let disposed = false;
+	let running = true;
 	let performanceMode = false;
 	let dirty = true;
 	let version = 0;
@@ -70,6 +74,7 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 	let watchdog = 0;
 	let spacerHeight = 0;
 	let ready: { promise: Promise<boolean>; resolve(value: boolean): void } | null = null;
+	let presentation: { resolve(): void; reject(error: Error): void } | null = null;
 	root.dataset.nativeState = "idle";
 
 	function finishEntrance(element: HTMLElement): void {
@@ -89,6 +94,8 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 		animation = 0;
 		ready?.resolve(false);
 		ready = null;
+		presentation?.reject(new Error(reason || "实时舞台已退出"));
+		presentation = null;
 		// Retain the spacer until the same nodes and their finished paint are back.
 		for (const { element, anchor } of moved) {
 			anchor.replaceWith(element);
@@ -125,7 +132,7 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 	}
 
 	function shouldAnimate(): boolean {
-		return options.effect || hooks.postfx.enabled || (performanceMode && hooks.notes.enabled);
+		return running && (performanceMode || options.effect || hooks.postfx.enabled);
 	}
 
 	function refreshAnimation(): void {
@@ -247,6 +254,8 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 			compositor.render(rectangles, options);
 			hold.hidden = true;
 			clearTimeout(watchdog);
+			presentation?.resolve();
+			presentation = null;
 			if (pending) {
 				hooks.onEnter(performanceMode);
 				pending = false;
@@ -293,6 +302,23 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 	return {
 		get active() { return active; },
 		enter,
+		present(enabled) {
+			if (!active || !compositor) return Promise.reject(new Error("实时舞台尚未就绪"));
+			presentation?.reject(new Error("实时舞台画面已被更新"));
+			const pending = Promise.withResolvers<void>();
+			presentation = pending;
+			options.effect = enabled;
+			dirty = true;
+			clearTimeout(watchdog);
+			watchdog = window.setTimeout(() => exit("实时舞台画面准备超时"), 5000);
+			requestPaint();
+			return pending.promise;
+		},
+		setRunning(value) {
+			running = value;
+			if (value) refreshAnimation();
+			else { cancelAnimationFrame(animation); animation = 0; }
+		},
 		exit,
 		dispose() { disposed = true; exit(); listeners.abort(); canvas.remove(); hold.remove(); },
 	};

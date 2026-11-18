@@ -1,5 +1,6 @@
 import { url } from "@/utils/url-utils";
 import { isNoiseBuild } from "@/utils/build-mode";
+import { isHomePage as isHomePath } from "./layout-utils";
 /**
  * 导航工具函数
  * 提供统一的页面导航功能，支持 Swup 无刷新跳转
@@ -160,6 +161,7 @@ export function getCurrentPath(): string {
  */
 export function isHomePage(): boolean {
 	const path = getCurrentPath();
+	if (isNoiseBuild && isHomePath(path)) return true;
 	return path === url("/") || path === url("");
 }
 

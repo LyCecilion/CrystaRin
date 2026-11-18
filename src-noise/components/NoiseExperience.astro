@@ -1,49 +1,82 @@
-<section id="noise-experience" data-noise-ui data-state="loading" aria-label="噪域演出">
+---
+const dev = import.meta.env.DEV;
+const entry = Astro.url.pathname === "/performance/" ? "performance" : "intro";
+---
+
+<section id="noise-experience" data-noise-ui data-state="loading" data-phase="checking" data-entry={entry} data-dev={dev ? "true" : undefined} aria-label="Desultory Signals">
   <canvas id="noise-scene-canvas" aria-hidden="true" hidden></canvas>
-  <div class="noise-intro" id="noise-intro" role="dialog" aria-modal="true" aria-labelledby="noise-intro-title">
-    <div class="noise-intro-card">
-      <span class="noise-eyebrow">CRYSTARIN / DESULTORY SIGNALS</span>
-      <h2 id="noise-intro-title">进入噪域</h2>
-      <p>原本安全的网页，也会被信号侵入。</p>
-      <p class="noise-instructions">无需按住鼠标。鼠标或触摸板指针触碰有效噪域后，污染会跟随指针约三秒，扰动经过的文字、图片与卡片；再次触碰会刷新时长。</p>
-      <p class="noise-warning">包含音乐、快速闪烁与动态效果。需要支持实验性 HTML-in-Canvas 的 Chrome；桌面窗口至少 1024 × 576。谱面在 4:3～16:9 之间适配窗口；超出时居中放大填满，两侧总裁切超过 20% 时暂停并提示调整尺寸。</p>
-      <p class="noise-instructions">进入演出后可用全段开关开启音符与 Auto Play 判定；关闭时保留纯噪域演出，无需手动打歌。</p>
-      <p id="noise-status" role="status" aria-live="polite">正在准备演出资源…</p>
-      <div class="noise-intro-actions">
-        <button type="button" id="noise-start" disabled>正在准备</button>
-        <button type="button" id="noise-dismiss">仅浏览首页</button>
-        <button type="button" id="noise-native-start">原生 HTML-in-Canvas（无音乐）</button>
-        <button type="button" id="noise-layer-start">图层接管验证（无音乐）</button>
+  <div id="noise-intro" class="noise-gate">
+    <main class="noise-checks" aria-labelledby="noise-check-title">
+      <p class="noise-eyebrow">PHIGROS / DESULTORY SIGNALS</p>
+      <h1 id="noise-check-title">SIGNAL CHECK</h1>
+      <dl class="noise-check-list">
+        <div><dt>VIEWPORT</dt><dd id="noise-check-viewport">检查窗口尺寸…</dd></div>
+        <div><dt>INPUT</dt><dd id="noise-check-input">检查指针设备…</dd></div>
+        <div><dt>HTML-IN-CANVAS</dt><dd id="noise-check-api">检查实验 API…</dd></div>
+        <div><dt>RESOURCES</dt><dd id="noise-check-assets">等待环境检查</dd></div>
+        <div><dt>GPU / FIRST FRAME</dt><dd id="noise-check-gpu">等待资源准备</dd></div>
+      </dl>
+      <p id="noise-status" role="status" aria-live="polite">正在检查演出环境…</p>
+      <div id="noise-browser-help" hidden>
+        <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">下载最新 Chrome ↗</a>
+        <p>需要 Chrome 的实验性 HTML-in-Canvas 支持。若最新版仍未通过，请在 chrome://flags 中检查 HTML-in-Canvas 相关实验项；是否可用以此处实际检测为准。</p>
       </div>
-      <p id="noise-native-status" role="status" aria-live="polite">支持实验 API 的 Chrome 可实时接管，自动适配窗口尺寸。</p>
-      <p id="noise-layer-status" role="status" aria-live="polite">截图预设匹配时可进入；滚动与退出保留真实页面位置。</p>
-      <small>Desultory Signals — technoplanet · AT / Phigros</small>
+      <button type="button" id="noise-retry" hidden>重新准备资源</button>
+      <button type="button" id="noise-start" hidden>继续演出</button>
+      <button type="button" id="noise-enable-audio" hidden>点击启用声音</button>
+      {dev && <button type="button" id="noise-dismiss">开发预览 · 浏览首页</button>}
+    </main>
+    <footer class="noise-credits">
+      <p>包含快速闪烁、强烈明暗变化及动态效果；光敏感或不适者请勿继续。{entry === "performance" ? "准备完成后点击进入博客，静场三秒后开始播放声音。" : "准备完成后将播放声音，前奏在 2 秒处定格，点击 AT 继续。"}</p>
+      <p>Desultory Signals — technoplanet · Phigros / Pigeon Games · 非官方同人演出，与原作及权利人无隶属关系。</p>
+      <p>SIGNAL Replica © Lylighte · MIT · Phira-Pro 衍生程序 GPL-3.0-only · Saira 字体 OFL-1.1</p>
+      <p>音乐、谱面及游戏素材归各自权利人所有，代码开源许可不包含这些素材的授权。</p>
+      <p><a href="https://github.com/LyCecilion/CrystaRin" target="_blank" rel="noopener noreferrer">源码</a> · <a href="/NOISE-LICENSE" target="_blank">GPL</a> · <a href="/NOISE-NOTICE" target="_blank">来源</a> · <a href="/SIGNAL-LICENSE" target="_blank">SIGNAL MIT</a> · <a href="/SIGNAL-FONT-LICENSE" target="_blank">Saira OFL</a></p>
+    </footer>
+  </div>
+  <div id="noise-selection" hidden>
+    <canvas id="noise-signal-canvas" aria-hidden="true"></canvas>
+    <canvas id="noise-difficulty-canvas" aria-hidden="true"></canvas>
+    <div id="noise-difficulties" role="group" aria-label="选择难度">
+      <span class="noise-locked-label" aria-disabled="true">EZ · 不可用</span>
+      <span class="noise-locked-label" aria-disabled="true">HD · 不可用</span>
+      <span class="noise-locked-label" aria-disabled="true">IN · 不可用</span>
+      <button type="button" id="noise-at" aria-label="AT · 开始演出"></button>
     </div>
   </div>
-  <button type="button" id="noise-launch" class="noise-launch" hidden>进入噪域</button>
+  {dev && <button type="button" id="noise-launch" class="noise-launch" hidden>进入噪域</button>}
   <div class="noise-toolbar" id="noise-toolbar" role="group" aria-label="演出控制" hidden>
     <button type="button" id="noise-toggle">暂停</button>
     <button type="button" id="noise-restart">重播</button>
-    <span id="noise-time" class="noise-time">00:00 / 00:00</span>
+    <span id="noise-time" class="noise-time"></span>
     <input id="noise-seek" type="range" min="0" max="100" step="0.05" value="0" aria-label="演出进度" />
     <button type="button" id="noise-mute" aria-pressed="false">静音</button>
-    <button type="button" id="noise-notes" aria-pressed="false">音符 / Auto Play：关</button>
+    <button type="button" id="noise-notes" aria-pressed="true">音符 / Auto Play：开</button>
     <button type="button" id="noise-exit">退出演出</button>
-    <span id="noise-play-status" class="noise-play-status" role="status" aria-live="polite"></span>
-    <span id="noise-judgements" class="noise-judgements" aria-live="off" hidden></span>
+    <span id="noise-play-status" role="status"></span>
+    <span id="noise-judgements"></span>
   </div>
-  <div class="noise-toolbar" id="noise-layer-toolbar" role="group" aria-label="首页图层验证" hidden>
-    <span>首页截图 · 原生滚动 · Esc 返回</span>
+  <div id="noise-debug-previews" hidden={!dev}>
+    <button type="button" id="noise-native-start">原生 HTML-in-Canvas（无音乐）</button>
+    <p id="noise-native-status" role="status"></p>
+    <button type="button" id="noise-layer-start">图层接管验证（无音乐）</button>
+    <p id="noise-layer-status" role="status"></p>
+  </div>
+  <div class="noise-toolbar" id="noise-layer-toolbar" hidden>
     <button type="button" id="noise-layer-effect" aria-pressed="true">噪域：开</button>
     <button type="button" id="noise-layer-exit">返回真实首页</button>
   </div>
-  <div class="noise-toolbar" id="noise-native-toolbar" role="group" aria-label="原生实时首页" hidden>
-    <span>实时 DOM → GPU · 原生滚动 · Esc 返回</span>
+  <div class="noise-toolbar" id="noise-native-toolbar" hidden>
     <button type="button" id="noise-native-effect" aria-pressed="true">噪域：开</button>
     <button type="button" id="noise-native-exit">返回真实首页</button>
   </div>
 </section>
 
+<style is:global>
+  html[data-build="noise"]:not([data-noise-surface]) body::after {
+    content: ""; position: fixed; inset: 0; background: #000; z-index: 9999;
+  }
+</style>
 <script>
   import { mountNoiseExperience } from "../engine/controller";
   import "../styles/experience.css";

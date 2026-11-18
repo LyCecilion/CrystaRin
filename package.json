@@ -17,6 +17,7 @@
     "test:noise-grid": "node scripts/check-noise-grid.mjs",
     "test:noise-dom": "node scripts/check-noise-dom.mjs",
     "test:noise-stage": "node scripts/check-noise-stage.mjs",
+    "test:noise-performance": "node scripts/check-noise-performance.mjs",
     "capture:noise": "node scripts/capture-noise-layers.mjs",
     "preview": "astro preview",
     "preview:noise": "node scripts/noise.mjs preview",

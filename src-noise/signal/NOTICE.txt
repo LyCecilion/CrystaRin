@@ -1,0 +1,23 @@
+Signal intro renderer provenance
+
+Upstream: https://github.com/Lylighte/signal-replica
+Revision: 8d2fd6d359257f2a22850a56bd643571909f1e2b
+Copyright (c) 2026 Lylighte
+License: MIT; complete permission and warranty notice in ./LICENSE.
+
+The following files are copied without modification from upstream dist/:
+engine.js, config.js, default-settings.js, design.js, themes.js,
+screen-curve.js, signal-distortion.js.
+Only the renderer dependency closure is included. No studio/editor application,
+export implementation, or third-party export vendor bundle is included.
+The original DEFAULT_SETTINGS and official APP_CONFIG duration are retained.
+
+assets/audio.wav is copied unchanged from upstream dist/assets/audio.wav,
+which is distributed with the above MIT-licensed project.
+assets/Saira-variable.ttf is copied unchanged from upstream dist/assets/.
+Saira is Copyright 2020 The Saira Project Authors
+(https://github.com/Omnibus-Type/Saira), licensed under SIL Open Font License
+1.1; the complete font license is retained in assets/OFL.txt.
+
+Local integration lives in ../engine/signal-intro.ts. Adjacent .d.ts files
+provide TypeScript boundaries without changing or type-checking upstream JS.

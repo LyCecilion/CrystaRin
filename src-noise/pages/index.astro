@@ -1,32 +1,5 @@
 ---
-import PostPage from "@/components/layout/PostPage.astro";
-import NoiseExperience from "../components/NoiseExperience.astro";
-import { siteConfig } from "@/config";
-import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { getSortedPosts } from "@/utils/content-utils";
-import "@/styles/banner-home.css";
-
-const posts = await getSortedPosts();
-const page = { data: posts.slice(0, siteConfig.pagination.postsPerPage) };
+import NoiseHomepage from "../components/NoiseHomepage.astro";
 ---
 
-<MainGridLayout heading={siteConfig.title}>
-  <PostPage page={page} />
-  <NoiseExperience />
-</MainGridLayout>
-
-<script>
-  // Keep the original link styling and local controls, but stay on this instance's only page.
-  function stayOnHome(event: MouseEvent) {
-    const target = event.target;
-    const anchor = target instanceof Element ? target.closest("a[href]") : null;
-    if (!(anchor instanceof HTMLAnchorElement) || anchor.hasAttribute("download")) return;
-    const destination = new URL(anchor.href);
-    if (destination.origin === location.origin && destination.pathname !== location.pathname) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    }
-  }
-  document.addEventListener("click", stayOnHome, true);
-  document.addEventListener("auxclick", stayOnHome, true);
-</script>
+<NoiseHomepage />

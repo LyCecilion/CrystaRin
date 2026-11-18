@@ -39,7 +39,10 @@ export const notePackCredit = {
 let assetsPromise: Promise<NoteAssets> | undefined;
 
 export function loadNoteAssets(): Promise<NoteAssets> {
-	return (assetsPromise ??= load());
+	return assetsPromise ??= load().catch((error: unknown) => {
+		assetsPromise = undefined;
+		throw error;
+	});
 }
 
 async function decode(url: string): Promise<HTMLImageElement> {

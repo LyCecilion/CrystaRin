@@ -80,8 +80,16 @@ async function serveDist() {
 
 async function readyScene(page) {
 	await page.waitForFunction(() => document.getElementById("noise-experience")?.dataset.mounted === "true");
-	await page.locator("#noise-dismiss").click();
-	await page.locator("#noise-intro").waitFor({ state: "hidden" });
+	if (await page.locator("#noise-dismiss").count()) {
+		await page.locator("#noise-dismiss").click();
+	} else {
+		// Production has no browse button. Capture only its underlying blog source,
+		// in an isolated headless page without the experimental drawable API.
+		await page.evaluate(() => {
+			document.getElementById("noise-experience").hidden = true;
+			document.documentElement.dataset.noiseSurface = "performance";
+		});
+	}
 	await page.addStyleTag({ content: `
 		html { scroll-behavior: auto !important; }
 		*, *::before, *::after {

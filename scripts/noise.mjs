@@ -49,7 +49,7 @@ if (command === "build") {
 	for (const name of ["LICENSE", "NOTICE"]) {
 		copyFileSync(path.join(root, "src-noise", name), path.join(root, "dist-noise", `NOISE-${name}`));
 	}
-	const capture = spawnSync(process.execPath, ["scripts/capture-noise-layers.mjs"], { cwd: root, env, stdio: "inherit" });
-	if (capture.error) throw capture.error;
-	if (capture.status !== 0) process.exit(capture.status ?? 1);
+	copyFileSync(path.join(root, "src-noise", "signal", "LICENSE"), path.join(root, "dist-noise", "SIGNAL-LICENSE"));
+	copyFileSync(path.join(root, "src-noise", "signal", "NOTICE.txt"), path.join(root, "dist-noise", "SIGNAL-NOTICE"));
+	copyFileSync(path.join(root, "src-noise", "signal", "assets", "OFL.txt"), path.join(root, "dist-noise", "SIGNAL-FONT-LICENSE"));
 }

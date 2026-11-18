@@ -46,5 +46,8 @@ export function loadPostFxAssets(): Promise<PostFxAssets> {
 		loadWire(),
 	]).then(([glitch, displace, glitchMap, grid, wire]) => ({
 		glitch, displace, glitchMap, grid, wire,
-	}));
+	})).catch((error: unknown) => {
+		assetsPromise = undefined;
+		throw error;
+	});
 }
