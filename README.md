@@ -204,7 +204,7 @@ GlitchDog 的预览把 glitchMapBrightness 解释为遮罩增益，scale 只作�
 
 - `scripts/noise.mjs` 为命令及后处理统一设置 `CRYSTARIN_BUILD=noise`，无需依赖平台特定的 shell 环境变量语法。开发与预览以前台进程配合 `--ignore-lock` 运行，避免误连到同仓库已运行的普通博客实例；同时运行时用 `--port` 指定不同端口，用 Ctrl+C 停止。
 - 噪域版使用独立的 `.astro-noise/` 缓存；保留封面、字体处理和首页内容的 Pagefind 索引，跳过站点地图和 VNDB 下载。日历和动态组件复用原静态数据接口，但不生成其他内容页。共享 `public/` 资源仍会复制；看板娘按原博客配置保留或裁剪。
-- 独立部署时选择 `pnpm build:noise` 和 `dist-noise`；即使设置了 `CF_WORKERS`，演出仍是纯静态输出，可使用 GitHub Actions + GitHub Pages，与普通博客的阿里云构建独立。
+- [GitHub Pages 工作流](.github/workflows/deploy.yml) 在 `master` 更新时运行 `pnpm build:noise`，只发布 `dist-noise/`。仓库 Settings → Pages 的发布来源选择 GitHub Actions。即使设置了 `CF_WORKERS`，演出仍是纯静态输出，与普通博客的阿里云构建独立。
 - 正式部署设置 `CRYSTARIN_NOISE_SITE=https://stellalyr.ink`，用于演出地址与 canonical；未设置时不借用原博客 canonical。页面始终带有 `noindex, nofollow`。只有 `pnpm dev:noise` 显示开发控制，生产构建与 `preview:noise` 都是无控制的正式流程。
 - 普通博客的部署命令和 `dist/` 输出保持不变。不要同时向两个构建任务写入共享的生成数据文件。
 - 桌面鼠标与至少 1024 × 576 CSS 像素的窗口才能开始。谱面在 **4:3～16:9** 之间直接适配窗口；更宽／窄时按最近边界居中 cover 裁切，总裁切最多 **20%**，即窗口比例约 **16:15～20:9**。噪域、音符、判定线及输入共用舞台坐标，博客与 UI 保持窗口原生布局。演出期间切换标签页不会暂停，音乐继续播放。进入演出后窗口尺寸失效时，Auto Play 音符与噪域暂时撤下、只保留后处理并继续播放，尺寸恢复后自动接回；前奏与难度选择阶段尺寸失效仍回到黑底检查并保留进度，恢复后手动继续。页面往返 BFCache 同样保留暂停恢复。资源失败可重试，不缓存失败的加载结果。页面包含快速闪烁，请谨慎体验。

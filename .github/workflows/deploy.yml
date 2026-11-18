@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy Noise to GitHub Pages
 
 on:
   push:
@@ -37,17 +37,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       
-      - name: Build site
-        run: pnpm run build
+      - name: Build noise experience
+        env:
+          CRYSTARIN_NOISE_SITE: https://stellalyr.ink
+        run: pnpm build:noise
 
-      - name: Create .nojekyll file
-        run: touch dist/.nojekyll
-      
-      - name: Upload artifact
+      - name: Upload noise artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: dist  # Astro默认构建输出目录
-          include-hidden-files: true  # Keep .nojekyll (excluded by default since v4)
+          path: dist-noise
 
   deploy:
     environment:
