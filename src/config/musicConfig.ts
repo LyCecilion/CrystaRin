@@ -1,12 +1,13 @@
 import type { MusicPlayerConfig } from "../types/musicConfig";
+import { isNoiseBuild } from "../utils/build-mode";
 
 // 音乐播放器配置
 export const musicPlayerConfig: MusicPlayerConfig = {
 	// 是否在导航栏显示音乐播放器入口
-	showInNavbar: true,
+	showInNavbar: !isNoiseBuild,
 
 	// 是否在侧边栏显示音乐播放器组件
-	showInSidebar: true,
+	showInSidebar: !isNoiseBuild,
 
 	// 使用方式："meting" 使用 Meting API，"local" 使用本地音乐列表
 	mode: "meting",

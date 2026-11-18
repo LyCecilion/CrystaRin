@@ -1,0 +1,2359 @@
+{
+  "title": "Desultory Signals — runtime effect timeline",
+  "reference": "对照测试记录；时间单位为秒，屏幕 UV 为左下原点",
+  "evaluation": {
+    "clamp": "p = clamp((t - prev.time) / (next.time - prev.time), 0, 1)",
+    "before_first": "first.value（separated 时 first.endValue）",
+    "after_last": "last.value（separated 时 last.startValue）",
+    "between": "prevValue + ease(p) * (nextValue - prevValue)",
+    "prevValue": "prev.separated ? prev.startValue : prev.value",
+    "nextValue": "next.separated ? next.endValue : next.value",
+    "ease": "easeType 0-14 用解析函数；15 用 prev.animationCurve.Evaluate(p)",
+    "all_separated_false": true
+  },
+  "directors": {
+    "vignetteRadius": {
+      "target": "vignettePlus.radius",
+      "keys": [
+        {
+          "time": 0.0,
+          "value": 0.15000000596046448,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 83.5999984741211,
+          "value": 0.15000000596046448,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.0,
+          "value": 0.15000000596046448,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.5,
+          "value": 0.15000000596046448,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 160.0,
+          "value": -10.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "vignetteDarkness": {
+      "target": "vignettePlus.darkness",
+      "keys": [
+        {
+          "time": 65.25,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 68.0,
+          "value": 0.800000011920929,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 83.0,
+          "value": 0.800000011920929,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 1.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.68000030517578,
+          "value": 0.30000001192092896,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.0,
+          "value": 0.30000001192092896,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.19999694824219,
+          "value": 0.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 97.16000366210938,
+          "value": 0.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 100.0,
+          "value": 0.800000011920929,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.11799621582031,
+          "value": 0.800000011920929,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 109.33000183105469,
+          "value": 0.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.5,
+          "value": 0.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 150.5,
+          "value": 1.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "bloomBrightness": {
+      "target": "bloom.brightness",
+      "keys": [
+        {
+          "time": 88.4800033569336,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 6.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.0,
+          "value": 2.0,
+          "easeType": 8,
+          "ease": "OutCubic",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 98.2300033569336,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 98.8499984741211,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0999984741211,
+          "value": 15.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.6500015258789,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 112.80000305175781,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 112.86000061035156,
+          "value": 10.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 113.5,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 115.13999938964844,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 115.23999786376953,
+          "value": 15.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 116.0,
+          "value": 3.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.93000030517578,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.94000244140625,
+          "value": 10.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 126.5,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.75,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.99000549316406,
+          "value": 20.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 147.10000610351562,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "glitchDogScale": {
+      "target": "glitchDog.scale",
+      "keys": [
+        {
+          "time": 65.25,
+          "value": 8.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 83.0,
+          "value": 5.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 84.33000183105469,
+          "value": 3.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.69999694824219,
+          "value": 9.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.0,
+          "value": 5.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 97.4000015258789,
+          "value": 5.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 100.0,
+          "value": 4.0,
+          "easeType": 9,
+          "ease": "InOutCubic",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.11000061035156,
+          "value": 2.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 109.0,
+          "value": 6.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 110.4000015258789,
+          "value": 5.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.75,
+          "value": 2.200000047683716,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "glitchMapBrightness": {
+      "target": "glitchDog.glitchMapBrightness",
+      "keys": [
+        {
+          "time": 65.25,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 70.08999633789062,
+          "value": 1.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 147.97999572753906,
+          "value": 1.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 147.99000549316406,
+          "value": 1.600000023841858,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 148.8300018310547,
+          "value": 0.0,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 148.94000244140625,
+          "value": 1.600000023841858,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.0500030517578,
+          "value": 0.0,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.16000366210938,
+          "value": 1.600000023841858,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.27000427246094,
+          "value": 0.0,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.3800048828125,
+          "value": 1.600000023841858,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.47999572753906,
+          "value": 0.0,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.58999633789062,
+          "value": 1.600000023841858,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 149.69000244140625,
+          "value": 0.0,
+          "easeType": 13,
+          "ease": "Zero",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "glitchMapContrast": {
+      "target": "glitchDog.glitchMapContrast",
+      "keys": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.93499755859375,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.94000244140625,
+          "value": 0.5,
+          "easeType": 14,
+          "ease": "One",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.97999572753906,
+          "value": 0.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.99000549316406,
+          "value": 3.5,
+          "easeType": 14,
+          "ease": "One",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "glitchMapOffset": {
+      "target": "glitchDog.glitchMapOffset",
+      "keys": []
+    },
+    "convergence": {
+      "target": "lensDistortion.convergence",
+      "keys": [
+        {
+          "time": 88.48999786376953,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 8.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.0,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0999984741211,
+          "value": 18.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 109.5,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 112.80000305175781,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 112.86000061035156,
+          "value": 8.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 113.30000305175781,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 115.2300033569336,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 115.23999786376953,
+          "value": 8.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 116.0,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.63999938964844,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.94000244140625,
+          "value": 18.0,
+          "easeType": 7,
+          "ease": "InCubic",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 126.80000305175781,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.74000549316406,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.75,
+          "value": 18.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 147.8000030517578,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "glitchRange": {
+      "target": "glitch.glitchRange",
+      "keys": [
+        {
+          "time": 65.0999984741211,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 66.5,
+          "value": 0.004999999888241291,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.4000015258789,
+          "value": 0.004999999888241291,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 0.23000000417232513,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.9000015258789,
+          "value": 0.00800000037997961,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 98.2300033569336,
+          "value": 0.009999999776482582,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 99.0,
+          "value": 0.013000000268220901,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 103.3499984741211,
+          "value": 0.013000000268220901,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 103.36000061035156,
+          "value": 0.05000000074505806,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 104.1500015258789,
+          "value": 0.019999999552965164,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0,
+          "value": 0.019999999552965164,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0999984741211,
+          "value": 0.20000000298023224,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.5,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 122.37000274658203,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 122.37999725341797,
+          "value": 0.05000000074505806,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 123.5,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "shiftRadius": {
+      "target": "rgbShift.radius",
+      "keys": [
+        {
+          "time": 0.0,
+          "value": 10.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 64.5,
+          "value": 10.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 65.80000305175781,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.4000015258789,
+          "value": 3.5999999046325684,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 88.5,
+          "value": 2.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 89.5,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 97.19999694824219,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 99.0,
+          "value": 3.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0,
+          "value": 3.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0999984741211,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 109.0,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 112.80000305175781,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 112.86000061035156,
+          "value": 2.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 113.5,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 115.19999694824219,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 115.23999786376953,
+          "value": 2.799999952316284,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 116.0,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 122.36000061035156,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 122.37999725341797,
+          "value": 2.5,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 123.80000305175781,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.93000030517578,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 125.94000244140625,
+          "value": 2.799999952316284,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 126.9000015258789,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 136.77000427246094,
+          "value": 4.150000095367432,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.75,
+          "value": 3.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 146.89999389648438,
+          "value": 2.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 148.0,
+          "value": 10.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "gridOpacity": {
+      "target": "grid image alpha",
+      "keys": [
+        {
+          "time": 0.0,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.0999984741211,
+          "value": 0.0,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 108.5,
+          "value": 0.6000000238418579,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    },
+    "bgAlpha": {
+      "target": "background alpha (not read by UpdateEffects)",
+      "keys": [
+        {
+          "time": 65.19999694824219,
+          "value": 0.800000011920929,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        },
+        {
+          "time": 68.0,
+          "value": 0.05000000074505806,
+          "easeType": 0,
+          "ease": "Linear",
+          "separated": false,
+          "startValue": 0.0,
+          "endValue": 0.0,
+          "animationCurveKeys": []
+        }
+      ]
+    }
+  },
+  "slashes": [
+    {
+      "index": 1,
+      "target": "dimensionSlash.Slashes[0]",
+      "infos": [
+        {
+          "time": 0.0,
+          "position": {
+            "x": 0.5,
+            "y": 0.4099999964237213
+          },
+          "lineDirection": 15.0,
+          "direction": 100.0
+        },
+        {
+          "time": 100.0,
+          "position": {
+            "x": 0.20000000298023224,
+            "y": 0.800000011920929
+          },
+          "lineDirection": 36.5099983215332,
+          "direction": -7.820000171661377
+        },
+        {
+          "time": 110.0,
+          "position": {
+            "x": 0.4099999964237213,
+            "y": 0.20000000298023224
+          },
+          "lineDirection": -1.5199999809265137,
+          "direction": 0.0
+        },
+        {
+          "time": 114.0,
+          "position": {
+            "x": 0.5,
+            "y": 0.20000000298023224
+          },
+          "lineDirection": 0.0,
+          "direction": 0.0
+        },
+        {
+          "time": 123.0,
+          "position": {
+            "x": 0.30000001192092896,
+            "y": 0.6000000238418579
+          },
+          "lineDirection": -1.3799999952316284,
+          "direction": 3.9000000953674316
+        },
+        {
+          "time": 140.0,
+          "position": {
+            "x": 0.6000000238418579,
+            "y": 0.4000000059604645
+          },
+          "lineDirection": -1.4700000286102295,
+          "direction": 2.7899999618530273
+        }
+      ],
+      "strength": {
+        "target": "dimensionSlash.Slashes[0].Strength",
+        "keys": [
+          {
+            "time": 88.48999786376953,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 88.5,
+            "value": 2.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 89.30000305175781,
+            "value": 0.0,
+            "easeType": 8,
+            "ease": "OutCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.08999633789062,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.0999984741211,
+            "value": 5.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 109.5,
+            "value": 0.0,
+            "easeType": 8,
+            "ease": "OutCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 112.80000305175781,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 112.86000061035156,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 113.5,
+            "value": 0.0,
+            "easeType": 8,
+            "ease": "OutCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 115.2300033569336,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 115.23999786376953,
+            "value": 3.0,
+            "easeType": 8,
+            "ease": "OutCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 116.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.93000030517578,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.94000244140625,
+            "value": 3.5,
+            "easeType": 8,
+            "ease": "OutCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 126.80000305175781,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.74000549316406,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.75,
+            "value": 3.5,
+            "easeType": 7,
+            "ease": "InCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 147.8000030517578,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "target": "dimensionSlash.Slashes[1]",
+      "infos": [
+        {
+          "time": 0.0,
+          "position": {
+            "x": 0.5,
+            "y": 0.4099999964237213
+          },
+          "lineDirection": -15.0,
+          "direction": 0.0
+        },
+        {
+          "time": 100.0,
+          "position": {
+            "x": 0.5,
+            "y": 0.800000011920929
+          },
+          "lineDirection": -47.65999984741211,
+          "direction": 0.0
+        },
+        {
+          "time": 112.0,
+          "position": {
+            "x": 0.30000001192092896,
+            "y": 0.800000011920929
+          },
+          "lineDirection": -47.7599983215332,
+          "direction": 1.2899999618530273
+        },
+        {
+          "time": 115.0,
+          "position": {
+            "x": 0.800000011920929,
+            "y": 0.20000000298023224
+          },
+          "lineDirection": 104.9800033569336,
+          "direction": -1.2599999904632568
+        },
+        {
+          "time": 120.0,
+          "position": {
+            "x": 0.20000000298023224,
+            "y": 0.6000000238418579
+          },
+          "lineDirection": 39.02000045776367,
+          "direction": -15.489999771118164
+        },
+        {
+          "time": 145.0,
+          "position": {
+            "x": 0.20000000298023224,
+            "y": 0.6000000238418579
+          },
+          "lineDirection": 118.56999969482422,
+          "direction": 13.180000305175781
+        }
+      ],
+      "strength": {
+        "target": "dimensionSlash.Slashes[1].Strength",
+        "keys": [
+          {
+            "time": 88.48999786376953,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 88.5,
+            "value": 2.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 89.30000305175781,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.08999633789062,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.0999984741211,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 110.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 112.80000305175781,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 112.86000061035156,
+            "value": 1.5,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 113.5,
+            "value": 0.0,
+            "easeType": 8,
+            "ease": "OutCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 115.23999786376953,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 115.4000015258789,
+            "value": 1.5,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 116.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.93000030517578,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.94000244140625,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 126.5,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.74000549316406,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.75,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 148.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "target": "dimensionSlash.Slashes[2]",
+      "infos": [
+        {
+          "time": 100.0,
+          "position": {
+            "x": 0.10000000149011612,
+            "y": 0.5
+          },
+          "lineDirection": 123.45999908447266,
+          "direction": 2.2100000381469727
+        },
+        {
+          "time": 120.0,
+          "position": {
+            "x": 0.20000000298023224,
+            "y": 0.800000011920929
+          },
+          "lineDirection": -17.15999984741211,
+          "direction": 43.81999969482422
+        },
+        {
+          "time": 145.0,
+          "position": {
+            "x": 0.800000011920929,
+            "y": 0.699999988079071
+          },
+          "lineDirection": 28.610000610351562,
+          "direction": -12.350000381469727
+        }
+      ],
+      "strength": {
+        "target": "dimensionSlash.Slashes[2].Strength",
+        "keys": [
+          {
+            "time": 108.08999633789062,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.0999984741211,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 109.5,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.93000030517578,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.94000244140625,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 126.80000305175781,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.74000549316406,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.75,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 147.1999969482422,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "target": "dimensionSlash.Slashes[3]",
+      "infos": [
+        {
+          "time": 100.0,
+          "position": {
+            "x": 0.800000011920929,
+            "y": 0.30000001192092896
+          },
+          "lineDirection": -25.959999084472656,
+          "direction": 26.450000762939453
+        },
+        {
+          "time": 120.0,
+          "position": {
+            "x": 0.6000000238418579,
+            "y": 0.699999988079071
+          },
+          "lineDirection": 42.279998779296875,
+          "direction": -18.190000534057617
+        },
+        {
+          "time": 145.0,
+          "position": {
+            "x": 0.8999999761581421,
+            "y": 0.4099999964237213
+          },
+          "lineDirection": -36.220001220703125,
+          "direction": 14.399999618530273
+        }
+      ],
+      "strength": {
+        "target": "dimensionSlash.Slashes[3].Strength",
+        "keys": [
+          {
+            "time": 108.08999633789062,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.0999984741211,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 109.5,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.9000015258789,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.94000244140625,
+            "value": 3.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 126.5,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.74000549316406,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.75,
+            "value": 3.5,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 148.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "target": "dimensionSlash.Slashes[4]",
+      "infos": [
+        {
+          "time": 100.0,
+          "position": {
+            "x": 0.5,
+            "y": 0.5
+          },
+          "lineDirection": 0.0,
+          "direction": 0.0
+        }
+      ],
+      "strength": {
+        "target": "dimensionSlash.Slashes[4].Strength",
+        "keys": [
+          {
+            "time": 108.08999633789062,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 108.0999984741211,
+            "value": 5.5,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 110.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.63999938964844,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 125.94000244140625,
+            "value": 5.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 127.0,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.74000549316406,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 146.75,
+            "value": 5.0,
+            "easeType": 7,
+            "ease": "InCubic",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          },
+          {
+            "time": 147.5,
+            "value": 0.0,
+            "easeType": 0,
+            "ease": "Linear",
+            "separated": false,
+            "startValue": 0.0,
+            "endValue": 0.0,
+            "animationCurveKeys": []
+          }
+        ]
+      }
+    }
+  ],
+  "ease_types": {
+    "0": "Linear",
+    "1": "InSine",
+    "2": "OutSine",
+    "3": "InOutSine",
+    "4": "InQuad",
+    "5": "OutQuad",
+    "6": "InOutQuad",
+    "7": "InCubic",
+    "8": "OutCubic",
+    "9": "InOutCubic",
+    "10": "InQuart",
+    "11": "OutQuart",
+    "12": "InOutQuart",
+    "13": "Zero",
+    "14": "One",
+    "15": "AnimationCurve"
+  },
+  "runtime": {
+    "freezeTime": 146.7530059814453,
+    "gridOpacity": [
+      {
+        "time": 0.0,
+        "value": 0.0,
+        "easeType": 0,
+        "ease": "Linear",
+        "separated": false,
+        "startValue": 0.0,
+        "endValue": 0.0,
+        "animationCurveKeys": []
+      },
+      {
+        "time": 108.0999984741211,
+        "value": 0.0,
+        "easeType": 0,
+        "ease": "Linear",
+        "separated": false,
+        "startValue": 0.0,
+        "endValue": 0.0,
+        "animationCurveKeys": []
+      },
+      {
+        "time": 108.5,
+        "value": 0.6000000238418579,
+        "easeType": 0,
+        "ease": "Linear",
+        "separated": false,
+        "startValue": 0.0,
+        "endValue": 0.0,
+        "animationCurveKeys": []
+      }
+    ],
+    "bgAlpha": [
+      {
+        "time": 65.19999694824219,
+        "value": 0.800000011920929,
+        "easeType": 0,
+        "ease": "Linear",
+        "separated": false,
+        "startValue": 0.0,
+        "endValue": 0.0,
+        "animationCurveKeys": []
+      },
+      {
+        "time": 68.0,
+        "value": 0.05000000074505806,
+        "easeType": 0,
+        "ease": "Linear",
+        "separated": false,
+        "startValue": 0.0,
+        "endValue": 0.0,
+        "animationCurveKeys": []
+      }
+    ],
+    "glitchMapOffset": []
+  }
+}

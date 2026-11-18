@@ -5,12 +5,6 @@
 		"avatarUrl": "https://avatars.githubusercontent.com/u/3616806?v=4",
 		"license": "CC0-1.0"
 	},
-	"cuteleaf/firefly": {
-		"description": "🍀Firefly, fresh and aesthetic Astro blog theme template. ",
-		"language": "Astro",
-		"avatarUrl": "https://avatars.githubusercontent.com/u/43440669?v=4",
-		"license": "MIT"
-	},
 	"dxhm/sectool": {
 		"description": "Cybersecurity tool repository / Wiki 收录常用 / 前沿 的CTF和渗透工具以及其 官方/使用 文档，致力于让每个工具都能发挥作用ww，不管你是萌新还是领域从业者希望你都能在这里找到适合你的工具或者获得一定的启发。",
 		"language": null,
@@ -34,12 +28,6 @@
 		"language": null,
 		"avatarUrl": "https://avatars.githubusercontent.com/u/16274549?v=4",
 		"license": null
-	},
-	"saicaca/fuwari": {
-		"description": "✨A static blog template built with Astro. ",
-		"language": "Astro",
-		"avatarUrl": "https://avatars.githubusercontent.com/u/25200299?v=4",
-		"license": "MIT"
 	},
 	"weschera/qwen3.8-27b-omlx-mtp-mac": {
 		"description": "Qwen 3.8 27B at 48-65 tok/s on a Mac Studio M4 Max — measured oMLX native-MTP recipe, same-day A/B vs mlx-vlm+MTP sidecar, raw benchmark JSON included",

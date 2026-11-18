@@ -1,0 +1,88 @@
+CrystaRin noise experience — licensing and upstream provenance
+
+The combined executable noise experience in src-noise, including its Phira-Pro
+material port and the shared MIT-licensed code it incorporates, is distributed
+under GNU GPL version 3 only. See LICENSE in this directory. Original MIT notices
+remain applicable to the original MIT portions; the repository-root MIT LICENSE
+is preserved and is not replaced for the ordinary blog or unrelated files.
+
+The native block material shader and mask/touch algorithms are adapted from:
+  Phira-Pro / Phira-Pro
+  https://github.com/Phira-Pro/Phira-Pro
+  revision c3873ea3d8759177630a2bbfea79036e99389118
+  prpr/src/core/block_shader.rs
+  prpr/src/core/block_shader_full.frag
+  prpr/src/core/block_shader_full.vert
+  prpr/src/core/block_mask.rs
+  prpr/src/core/block_touch.rs
+Copyright remains with the respective Phira-Pro contributors. The original
+fragment shader is preserved in engine/phira/block_shader_full.frag. WebGL and
+TypeScript adaptations are identified in the corresponding source headers.
+
+The optional note/Auto Play presentation adapts PGR parsing, projection,
+independent Hold-body geometry and automatic judgement timing from Phira-Pro:
+  revision 0c5cf2ee9d2bac1292f16287bb6b662ceee40365
+  prpr/src/parse/pgr.rs
+  prpr/src/core/note.rs
+  prpr/src/core/hold_body.rs
+  prpr/src/core/line.rs
+  prpr/src/judge.rs
+The nine unchanged default nomo note/hit-effect PNGs and original info.yml in
+assets/notes originate in that revision's assets/respack. Original metadata
+credits 星鹿ELEC for artwork and 不会读谱的FW小赵呀 for sound. This presentation
+does not import those sound files. The imported images follow the upstream
+GPL-3.0 declaration; no separate respack exception was found in that revision.
+The separately licensed assets/rpen resources are not used. This provenance
+record is not independent rights clearance for unrelated Phigros game assets.
+
+Anyone redistributing the combined noise application must preserve applicable
+copyright/license notices and satisfy GPLv3's Corresponding Source requirements;
+shipping only generated/minified JavaScript is not a replacement for source.
+
+The SIGNAL difficulty-escalation prologue uses the unmodified minimal renderer,
+default settings, Saira font and original intro audio from SIGNAL Replica by
+Lylighte. See signal/NOTICE.txt, signal/LICENSE and signal/assets/OFL.txt.
+Built distributions include SIGNAL-LICENSE, SIGNAL-NOTICE and SIGNAL-FONT-LICENSE.
+The MIT renderer license does not independently clear the intro audio rights.
+
+This code license does not grant rights to third-party music, charts, original
+game textures, blog posts, photographs, or other content. Desultory Signals music
+and chart data and the supplied block-area textures retain their respective
+owners' rights. Public deployment/republication requires appropriate permissions.
+This local implementation work is not itself a publication or rights clearance.
+
+The adjustable seven-pass shaders are clean-room approximations of the parameter
+record in blockarea/main revision 789e10f, not ports of original Phigros shaders.
+Song-time choreography uses the settings-level timeline record at ef32e4b.
+Grid expansion follows the appearance note at blockarea/main revision 1c962f4
+and the supplied two-scale, phase-crossfade formula, sampling FrameBase's R channel.
+The undocumented freeze-branch resets and shader mappings are not claimed exact.
+assets/postfx contains original Glitch4in1, DisplaceMap, GlitchMap and FrameBase
+images, plus the original WireNoise_R8_Array payload extracted from the supplied
+Phigros 4.0.1.2 APKPure local resources. These game assets are not relicensed under
+GPL or MIT by this work; the local preview does not establish redistribution rights.
+
+Original MIT portions — retained copyright and permission notice:
+
+MIT License
+
+Copyright (c) 2024 saicaca
+Copyright (c) 2025 CuteLeaf
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
