@@ -13,6 +13,8 @@ export interface NativeTakeover {
 	setRunning(running: boolean): void;
 	/** Resolve only after a fresh frame has presented the requested scene mode. */
 	present(effect: boolean): Promise<void>;
+	/** Drop or restore the noise material alone, keeping postfx and the song clock untouched. */
+	setNoise(enabled: boolean): void;
 	exit(reason?: string): void;
 	dispose(): void;
 }
@@ -313,6 +315,13 @@ export function mountNativeTakeover(root: HTMLElement, hooks: {
 			watchdog = window.setTimeout(() => exit("实时舞台画面准备超时"), 5000);
 			requestPaint();
 			return pending.promise;
+		},
+		setNoise(value) {
+			if (options.effect === value) return;
+			options.effect = value;
+			effect.setAttribute("aria-pressed", String(value));
+			effect.textContent = value ? "噪域：开" : "噪域：关";
+			refreshAnimation();
 		},
 		setRunning(value) {
 			running = value;

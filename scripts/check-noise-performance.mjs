@@ -42,6 +42,7 @@ try {
 		});
 		observer.observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-phase", "data-signal-time", "style", "hidden"] });
 		window.quietObservation = null;
+		window.quietCurtain = null;
 		window.performanceObservation = null;
 		let quietSince = null;
 		let quietVisible = 0;
@@ -51,6 +52,13 @@ try {
 			const now = performance.now();
 			if (root.dataset.phase === "quiet") {
 				if (quietSince === null) quietSince = now;
+				if (!window.quietCurtain) {
+					const curtain = document.querySelector("#noise-curtain");
+					window.quietCurtain = {
+						visible: curtain ? !curtain.hidden : false,
+						opacity: curtain ? getComputedStyle(curtain).opacity : null,
+					};
+				}
 				if (!window.quietObservation) {
 					const audio = document.querySelector("audio");
 					window.quietObservation = { paused: audio.paused, time: audio.currentTime, path: location.pathname };
@@ -68,6 +76,7 @@ try {
 	});
 	await page.goto(base);
 	await page.waitForSelector('#noise-check-viewport[data-ok="false"]');
+	assert.equal(await page.locator("#noise-status").textContent(), "BLOCKED", "a failing check must never leave READY on the gate");
 	assert.equal(await page.locator("#noise-selection").isVisible(), false, "small windows must not enter selection");
 	assert.equal(await page.locator("#noise-dismiss").count(), 0, "production must not expose the development browse entry");
 	assert.equal(await page.locator("#noise-check-api").getAttribute("data-ok"), "true", "this regression requires Chrome HTML-in-Canvas support");
@@ -123,46 +132,38 @@ try {
 	assert.equal(await page.locator("#noise-difficulty-canvas").isVisible(), false);
 	await page.waitForSelector('#noise-experience[data-phase="quiet"]');
 	assert.deepEqual(await page.evaluate(() => window.quietObservation), { paused: true, time: 0, path: "/performance/" });
+	assert.deepEqual(await page.evaluate(() => window.quietCurtain), { visible: true, opacity: "1" }, "the postlude must open on pure black, not on the blog");
 	assert.equal(new URL(page.url()).pathname, "/performance/");
 	assert.equal(await page.evaluate(() => performance.timeOrigin), documentTimeOrigin, "the stage URL must change without reloading or losing preloaded resources");
 	assert.equal(context.pages().length, 1, "the transition must remain in the same tab");
-	const quietPixels = await sharp(await page.screenshot()).removeAlpha().raw().toBuffer();
-	assert.ok(quietPixels.some(value => value > 32), "the quiet stage must visibly show the blog, not a black loading screen");
-	await page.setViewportSize({ width: 800, height: 600 });
-	await page.waitForSelector('#noise-experience[data-phase="paused"]');
-	assert.equal(await page.locator("audio").evaluate(audio => audio.paused && audio.currentTime === 0), true);
-	await page.evaluate(async () => {
-		const start = performance.now();
-		while (performance.now() - start < 1000) {
-			const { promise, resolve } = Promise.withResolvers();
-			requestAnimationFrame(resolve);
-			await promise;
-		}
-	});
-	await page.setViewportSize({ width: 1280, height: 720 });
-	await page.locator("#noise-start:not([disabled])").waitFor({ state: "visible" });
-	await page.locator("#noise-start").click();
-	await page.waitForSelector('#noise-experience[data-phase="quiet"]');
-	await page.waitForSelector('#noise-experience[data-phase="performance"]');
+	await page.waitForFunction(() => {
+		const curtain = document.querySelector("#noise-curtain");
+		if (!curtain || curtain.hidden) return false;
+		const opacity = Number(getComputedStyle(curtain).opacity);
+		return opacity > 0.05 && opacity < 0.95;
+	}, null, { timeout: 30000 });
+	await page.waitForSelector('#noise-experience[data-phase="performance"]', { timeout: 30000 });
+	assert.equal(await page.locator("#noise-curtain").isVisible(), false, "the exposure must be complete before the show");
 	const quietVisible = await page.evaluate(() => window.performanceObservation.quietVisible);
-	assert.ok(quietVisible >= 2950 && quietVisible < 6000, `only visible quiet-stage time should count toward three seconds; got ${quietVisible}ms`);
+	assert.ok(quietVisible >= 8800 && quietVisible < 13000, `the black aftermath, exposure and five quiet seconds must all count as visible stage time; got ${quietVisible}ms`);
 	assert.deepEqual(navigations, [], "the handoff must not trigger another document request");
 	assert.match(await page.locator("audio").getAttribute("src"), /^blob:/, "the song must play from fully fetched local bytes");
 	assert.equal(await page.locator("#noise-toolbar").isVisible(), false);
 	assert.equal(await page.locator(".noise-postfx-launch").count(), 0);
 	await page.waitForFunction(() => document.querySelector("audio").currentTime > 1);
-	console.log("offline same-document /performance/ handoff and three-second quiet blog with interruption recovery: passed");
+	console.log("offline same-document /performance/ handoff, black postlude, exposure and five quiet seconds: passed");
 
+	// The show is never paused by a failing viewport: only the stage layers withdraw.
+	const beforeResize = await page.locator("audio").evaluate(audio => audio.currentTime);
 	await page.setViewportSize({ width: 800, height: 600 });
-	await page.waitForSelector('#noise-experience[data-phase="paused"]');
-	assert.equal(await page.locator("audio").evaluate(audio => audio.paused), true);
-	const pausedAt = await page.locator("audio").evaluate(audio => audio.currentTime);
+	await page.waitForTimeout(1500);
+	const afterResize = await page.locator("audio").evaluate(audio => audio.currentTime);
+	assert.ok(afterResize > beforeResize + 0.8, `a failing viewport must keep the song running; ${beforeResize} -> ${afterResize}`);
+	assert.equal(await page.locator("#noise-experience").getAttribute("data-phase"), "performance");
+	assert.equal(await page.locator("audio").evaluate(audio => audio.paused), false);
 	await page.setViewportSize({ width: 1280, height: 720 });
-	await page.locator("#noise-start:not([disabled])").waitFor({ state: "visible" });
-	assert.equal(await page.locator("audio").evaluate(audio => audio.currentTime), pausedAt, "valid dimensions must not automatically restart playback");
-	await page.locator("#noise-start").click();
-	await page.waitForSelector('#noise-experience[data-phase="performance"]');
-	console.log("offline resize interruption and explicit resume: passed");
+	await page.waitForFunction(target => document.querySelector("audio").currentTime > target, afterResize + 1, { timeout: 30000 });
+	console.log("failing viewport keeps the song running: passed");
 
 	// No seeking or playback-rate acceleration: exercise the real song-end event.
 	await page.waitForSelector('#noise-experience[data-phase="ended"]', { timeout: 190000 });

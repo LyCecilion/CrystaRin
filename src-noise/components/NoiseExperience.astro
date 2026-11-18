@@ -6,28 +6,28 @@ const entry = Astro.url.pathname === "/performance/" ? "performance" : "intro";
 <section id="noise-experience" data-noise-ui data-state="loading" data-phase="checking" data-entry={entry} data-dev={dev ? "true" : undefined} aria-label="Desultory Signals">
   <canvas id="noise-scene-canvas" aria-hidden="true" hidden></canvas>
   <div id="noise-intro" class="noise-gate">
-    <main class="noise-checks" aria-labelledby="noise-check-title">
-      <p class="noise-eyebrow">PHIGROS / DESULTORY SIGNALS</p>
-      <h1 id="noise-check-title">SIGNAL CHECK</h1>
+    <main class="noise-checks" aria-label="SIGNAL CHECK">
       <dl class="noise-check-list">
-        <div><dt>VIEWPORT</dt><dd id="noise-check-viewport">检查窗口尺寸…</dd></div>
-        <div><dt>INPUT</dt><dd id="noise-check-input">检查指针设备…</dd></div>
-        <div><dt>HTML-IN-CANVAS</dt><dd id="noise-check-api">检查实验 API…</dd></div>
-        <div><dt>RESOURCES</dt><dd id="noise-check-assets">等待环境检查</dd></div>
-        <div><dt>GPU / FIRST FRAME</dt><dd id="noise-check-gpu">等待资源准备</dd></div>
+        <div><dt>VIEWPORT</dt><dd id="noise-check-viewport">PENDING</dd></div>
+        <div><dt>INPUT</dt><dd id="noise-check-input">PENDING</dd></div>
+        <div><dt>HTML-IN-CANVAS</dt><dd id="noise-check-api">PENDING</dd></div>
+        <div><dt>RESOURCES</dt><dd id="noise-check-assets">PENDING</dd></div>
+        <div><dt>GPU / FIRST FRAME</dt><dd id="noise-check-gpu">PENDING</dd></div>
       </dl>
-      <p id="noise-status" role="status" aria-live="polite">正在检查演出环境…</p>
+      <p id="noise-status" role="status" aria-live="polite">CHECKING</p>
       <div id="noise-browser-help" hidden>
-        <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">下载最新 Chrome ↗</a>
-        <p>需要 Chrome 的实验性 HTML-in-Canvas 支持。若最新版仍未通过，请在 chrome://flags 中检查 HTML-in-Canvas 相关实验项；是否可用以此处实际检测为准。</p>
+        <p>Requires Chrome with the experimental HTML-in-Canvas flag.</p>
+        <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Get Chrome ↗</a>
       </div>
-      <button type="button" id="noise-retry" hidden>重新准备资源</button>
-      <button type="button" id="noise-start" hidden>继续演出</button>
-      <button type="button" id="noise-enable-audio" hidden>点击启用声音</button>
-      {dev && <button type="button" id="noise-dismiss">开发预览 · 浏览首页</button>}
+      <div class="noise-actions">
+        <button type="button" id="noise-retry" hidden>RETRY</button>
+        <button type="button" id="noise-start" hidden>CONTINUE</button>
+        <button type="button" id="noise-enable-audio" hidden>ENABLE AUDIO</button>
+        {dev && <button type="button" id="noise-dismiss">DEV · BROWSE</button>}
+      </div>
     </main>
     <footer class="noise-credits">
-      <p>包含快速闪烁、强烈明暗变化及动态效果；光敏感或不适者请勿继续。{entry === "performance" ? "准备完成后点击进入博客，静场三秒后开始播放声音。" : "准备完成后将播放声音，前奏在 2 秒处定格，点击 AT 继续。"}</p>
+      <p>包含快速闪烁、强烈明暗变化及动态效果；光敏感或不适者请勿继续。{entry === "performance" ? "准备完成后点击进入博客，画面淡入并静置数秒后开始播放声音。" : "准备完成后将播放声音，前奏在 2 秒处定格，点击 AT 继续。"}</p>
       <p>Desultory Signals — technoplanet · Phigros / Pigeon Games · 非官方同人演出，与原作及权利人无隶属关系。</p>
       <p>SIGNAL Replica © Lylighte · MIT · Phira-Pro 衍生程序 GPL-3.0-only · Saira 字体 OFL-1.1</p>
       <p>音乐、谱面及游戏素材归各自权利人所有，代码开源许可不包含这些素材的授权。</p>
@@ -44,6 +44,7 @@ const entry = Astro.url.pathname === "/performance/" ? "performance" : "intro";
       <button type="button" id="noise-at" aria-label="AT · 开始演出"></button>
     </div>
   </div>
+  <div id="noise-curtain" aria-hidden="true" hidden></div>
   {dev && <button type="button" id="noise-launch" class="noise-launch" hidden>进入噪域</button>}
   <div class="noise-toolbar" id="noise-toolbar" role="group" aria-label="演出控制" hidden>
     <button type="button" id="noise-toggle">暂停</button>
@@ -76,6 +77,8 @@ const entry = Astro.url.pathname === "/performance/" ? "performance" : "intro";
   html[data-build="noise"]:not([data-noise-surface]) body::after {
     content: ""; position: fixed; inset: 0; background: #000; z-index: 9999;
   }
+  /* Black after SIGNAL, then a slow exposure of the blog instead of a hard page swap. */
+  #noise-curtain { position: absolute; inset: 0; background: #000; pointer-events: none; }
 </style>
 <script>
   import { mountNoiseExperience } from "../engine/controller";

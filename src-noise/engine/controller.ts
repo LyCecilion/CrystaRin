@@ -26,7 +26,12 @@ import { prepareHomepage, type PreparedHomepage } from "./prepare-homepage";
 type Phase = "checking" | "opening" | "selection" | "prelude" | "handoff" | "quiet" | "performance" | "paused" | "ended" | "browse";
 const clock = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 const difficultyFadeDuration = 0.6;
-const quietBlogDuration = 3000;
+/** SIGNAL's aftermath: pure black, then the blog exposed and left alone before the show takes it. */
+const quietBlackDuration = 3000;
+const quietFadeDuration = 900;
+const quietBlogDuration = 5000;
+/** The chart's first noise burst: postfx joins there instead of from the first bar. */
+const postFxStart = 4.7524;
 
 export function mountNoiseExperience(root: HTMLElement): void {
 	if (root.dataset.mounted) return;
@@ -54,6 +59,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	const resume = get<HTMLButtonElement>("noise-start");
 	const retry = get<HTMLButtonElement>("noise-retry");
 	const toolbar = get("noise-toolbar");
+	const curtain = get("noise-curtain");
 	const seek = get<HTMLInputElement>("noise-seek");
 	const audio = new PerformanceAudio(musicUrl);
 	root.append(audio.element);
@@ -88,10 +94,14 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	let animation = 0;
 	let fade: Animation | null = null;
 	let lastUi = 0;
-	let quietRemaining = quietBlogDuration;
+	const postludeBlack = directPerformance ? 0 : quietBlackDuration;
+	const postludeTotal = postludeBlack + quietFadeDuration + quietBlogDuration;
+	let quietRemaining = postludeTotal;
 	let quietFrame = 0;
 	const openedAt = performance.now();
 	let contaminationActive = false;
+	let postFxStarted = false;
+	let stageOk = true;
 	const infection = createPointerInfection((x1, y1, x2, y2, strength) => {
 		if (contaminationActive) contamination.infectPath(
 			unprojectPresentation(x1, innerWidth, presentationScale), unprojectPresentation(y1, innerHeight, presentationScale),
@@ -134,8 +144,28 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		if (next === "opening" || next === "selection") difficultyCanvas.style.opacity = "1";
 		toolbar.hidden = !dev || next !== "performance";
 		resume.hidden = next !== "paused";
-		if (next === "paused") resume.textContent = "继续演出";
+		if (next === "paused") resume.textContent = "CONTINUE";
 		at.disabled = next !== "selection" || !allowed || !warm || busy;
+	}
+	/** The gate only reports machine state; a failing check must never leave READY behind. */
+	function refreshGateStatus(): void {
+		if (phase !== "checking") return;
+		status.textContent = !allowed || !apiReady ? "BLOCKED" : failed ? "FAILED" : preparing ? "PREPARING" : warm ? "READY" : "CHECKING";
+	}
+	/** Only layers that need a valid stage withdraw; postfx, audio and the blog keep going. */
+	function applyStageLayers(): void {
+		if (phase === "performance") native.setNoise(stageOk);
+	}
+	function clearCurtain(): void {
+		curtain.hidden = true;
+		curtain.style.opacity = "";
+	}
+	function applyCurtain(remaining: number): void {
+		const elapsed = postludeTotal - remaining;
+		const progress = Math.max(0, Math.min(1, (elapsed - postludeBlack) / quietFadeDuration));
+		if (progress >= 1) { clearCurtain(); return; }
+		curtain.hidden = false;
+		curtain.style.opacity = String(1 - progress * progress * (3 - 2 * progress));
 	}
 	function cancelVisuals(): void {
 		if (phase === "quiet" && quietFrame) quietRemaining = Math.max(0, quietRemaining - (performance.now() - quietFrame));
@@ -144,6 +174,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		animation = 0;
 		fade?.cancel();
 		fade = null;
+		clearCurtain();
 		gate.style.opacity = "";
 	}
 	function resetPollution(): void {
@@ -163,11 +194,11 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		if (phase === "handoff") resumePhase = "quiet";
 		else if (phase === "opening" || phase === "performance" || phase === "prelude" || phase === "quiet") resumePhase = phase;
 		setPhase(resumePhase ? "paused" : "checking");
-		status.textContent = `准备中断：${error instanceof Error ? error.message : String(error)}。请检查连接后重试。`;
+		status.textContent = `FAILED / ${error instanceof Error ? error.message : String(error)}`;
 		retry.hidden = false;
 		resume.hidden = true;
 	}
-	function suspend(message: string): void {
+	function suspend(): void {
 		if (phase !== "opening" && phase !== "prelude" && phase !== "performance" && phase !== "quiet" && phase !== "handoff") return;
 		resumePhase = phase === "handoff" ? "quiet" : phase;
 		version++;
@@ -178,7 +209,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		native.setRunning(false);
 		resetPollution();
 		setPhase("paused");
-		status.textContent = message;
+		status.textContent = "PAUSED";
 		resume.disabled = !allowed || !apiReady || !warm || preparing;
 	}
 	function syncUi(): void {
@@ -194,9 +225,16 @@ export function mountNoiseExperience(root: HTMLElement): void {
 			const sampled = sampleChart(chart, songTime, stage.width, stage.height);
 			const playing = phase === "performance" && !audio.element.paused;
 			if (phase === "performance" || resumePhase === "performance") {
-				contaminationActive = contamination.prepare(songTime);
-				infection.sample(chart, inputStage, songTime, nowMs, playing);
-				if (contaminationActive) contamination.sample(sampled.areas, stage, songTime, playing, infection.pointer);
+				if (!postFxStarted && songTime >= postFxStart) {
+					postFxStarted = true;
+					postfx.enabled = true;
+					syncPresentation();
+				}
+				contaminationActive = stageOk && contamination.prepare(songTime);
+				if (stageOk) {
+					infection.sample(chart, inputStage, songTime, nowMs, playing);
+					if (contaminationActive) contamination.sample(sampled.areas, stage, songTime, playing, infection.pointer);
+				}
 			}
 			audio.setPollution(infection.pointer.strength);
 			touches.length = 0;
@@ -208,7 +246,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 				touches.push(touch);
 			}
 			frame.stage = stage; frame.chart = sampled; frame.time = songTime; frame.touchTime = nowMs / 1000;
-			if (notesState.enabled && noteChart) {
+			if (notesState.enabled && noteChart && stageOk) {
 				sampleNoteChart(noteChart, songTime, sampled.lines, stage.width, stage.height, noteFrame);
 				frame.notes = noteFrame;
 			} else frame.notes = undefined;
@@ -233,6 +271,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 				const now = performance.now();
 				if (quietFrame) quietRemaining = Math.max(0, quietRemaining - (now - quietFrame));
 				quietFrame = now;
+				applyCurtain(quietRemaining);
 				if (quietRemaining === 0) { void beginPerformance(); return; }
 			} else if (phase === "selection") renderSelection(false);
 			else if ((phase === "opening" || phase === "prelude") && intro) {
@@ -264,8 +303,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 			resumePhase = "quiet";
 			resume.hidden = false;
 			resume.disabled = false;
-			resume.textContent = "进入博客";
-			status.textContent = "准备就绪。点击进入博客，静场三秒后开始演出。";
+			resume.textContent = "ENTER BLOG";
 			return;
 		}
 		if (!intro) return;
@@ -274,7 +312,6 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		try {
 			const permission = intro.unlockAudio();
 			enableAudio.hidden = intro.audioReady;
-			if (!intro.audioReady) status.textContent = "浏览器限制自动播放，请点击启用声音后继续。";
 			await permission;
 		} catch (error) { if (operation === version) showFailure(error); return; }
 		if (disposed || operation !== version || !allowed || document.hidden) return;
@@ -305,8 +342,8 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		preparing = true;
 		failed = false;
 		retry.hidden = true;
-		check("noise-check-assets", "下载、解码并准备整场演出…");
-		status.textContent = directPerformance ? "正在准备博客舞台和完整演出资源…" : "准备完成后将进入难度选择。演出开始后不再依赖网络。";
+		check("noise-check-assets", "PREPARING / audio · prelude · chart · fonts · notes · textures · homepage");
+		status.textContent = "PREPARING";
 		try {
 			if (!resourcesReady) {
 				const json = async (url: string) => {
@@ -333,18 +370,18 @@ export function mountNoiseExperience(root: HTMLElement): void {
 				}
 				resourcesReady = true;
 			}
-			check("noise-check-assets", "READY / 音乐、前奏、谱面、字体、音符、纹理及首页", true);
+			check("noise-check-assets", "READY / audio · prelude · chart · fonts · notes · textures · homepage", true);
 			if (root.dataset.phase === "browse") return;
 			if (allowed && !document.hidden && !native.active) {
-				check("noise-check-gpu", "正在预热真实 DOM 与完整渲染管线…");
+				check("noise-check-gpu", "PREPARING / real DOM · full pipeline");
 				if (!await native.enter(true)) throw new Error(get("noise-native-status").textContent || "首帧准备失败");
 			}
 			if (disposed || terminal) return;
 			warm = native.active;
 			native.setRunning(false);
-			check("noise-check-gpu", warm ? "READY / 首帧完成" : "等待窗口恢复后预热", warm);
-			if (resumePhase) { resume.hidden = false; resume.disabled = !allowed || !warm; status.textContent = "环境已恢复，点击继续演出。"; }
-			else if (warm) status.textContent = "ALL SYSTEMS READY";
+			check("noise-check-gpu", warm ? "READY / first frame" : "PENDING / first frame", warm);
+			if (resumePhase) { resume.hidden = false; resume.disabled = !allowed || !warm; status.textContent = "PAUSED"; }
+			else refreshGateStatus();
 		} catch (error) {
 			if (!disposed) showFailure(error);
 		} finally {
@@ -365,17 +402,26 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		apiReady = probe.content === "drawable" && typeof probe.requestPaint === "function"
 			&& typeof probe.getElementImageDefaultSize === "function"
 			&& typeof WebGL2RenderingContext !== "undefined" && "texElementSubImage2D" in WebGL2RenderingContext.prototype;
-		check("noise-check-viewport", `${innerWidth} × ${innerHeight} / ${dimensions ? "PASS" : "请调整至至少 1024 × 576，宽高比 16:15～20:9"}`, dimensions);
-		check("noise-check-input", pointer ? "PASS / 鼠标或触摸板" : "需要鼠标或触摸板", pointer);
-		check("noise-check-api", apiReady ? "PASS / Drawable Canvas + WebGL 2 元素上传" : "未检测到所需实验 API", apiReady);
+		check("noise-check-viewport", `${innerWidth} × ${innerHeight} / ${dimensions ? "PASS" : "FAIL · min 1024 × 576 · 16:15–20:9"}`, dimensions);
+		check("noise-check-input", pointer ? "PASS / pointer" : "FAIL / pointer required", pointer);
+		check("noise-check-api", apiReady ? "PASS / Drawable Canvas + WebGL 2 element upload" : "FAIL / experimental API unavailable", apiReady);
 		get("noise-browser-help").hidden = apiReady;
-		if (!allowed || !apiReady) {
-			if (phase === "opening" || phase === "prelude" || phase === "performance" || phase === "quiet" || phase === "handoff") suspend("环境已改变，请调整窗口后继续演出。");
+		stageOk = allowed && apiReady;
+		if (stageOk) {
+			if (phase === "performance") applyStageLayers();
+		} else if (phase === "performance" || phase === "quiet" || phase === "handoff") {
+			// The show keeps playing on a failing viewport; only the stage-dependent layers withdraw.
+			applyStageLayers();
+			resetPollution();
+			contamination.reset();
+			contaminationActive = false;
+		} else {
+			if (phase === "opening" || phase === "prelude") suspend();
 			else if (phase === "selection") { cancelVisuals(); setPhase("checking"); }
 			else if (busy && phase === "checking") { version++; busy = false; cancelVisuals(); }
-			if (phase === "checking") status.textContent = apiReady ? "请调整浏览器窗口或输入设备。" : "请使用支持并已启用 HTML-in-Canvas 的 Chrome。";
 			if (native.active) native.exit();
 		}
+		refreshGateStatus();
 		resume.disabled = !allowed || !apiReady || !warm || preparing;
 		if (phase === "selection") renderSelection();
 		if (allowed && apiReady && !failed && (phase === "checking" || phase === "paused")) void prepare();
@@ -409,24 +455,25 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		if (busy || disposed || terminal) return;
 		busy = true;
 		const operation = ++version;
-		if (reset) quietRemaining = quietBlogDuration;
+		if (reset) quietRemaining = postludeTotal;
 		resumePhase = "quiet";
 		setPhase("handoff");
 		try {
 			intro?.pause();
 			audio.pause();
 			postfx.enabled = false;
+			postFxStarted = false;
 			notesState.enabled = false;
 			contamination.reset();
 			contaminationActive = false;
 			resetPollution();
 			syncPresentation();
 			native.setRunning(false);
-			if (!allowed || document.hidden) { suspend("请恢复窗口后继续博客静场。"); return; }
+			if (!apiReady) { suspend(); return; }
 			if (!native.active && !await native.enter(true)) throw new Error("博客舞台恢复失败");
 			if (operation !== version || disposed) return;
 			await native.present(false);
-			if (operation !== version || disposed || document.hidden) return;
+			if (operation !== version || disposed) return;
 			// This is a stage transition, not a navigation: keep decoded resources and GPU state.
 			if (location.pathname !== "/performance/") history.replaceState(history.state, "", "/performance/");
 			const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
@@ -436,6 +483,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 				for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[property="og:url"], meta[name="twitter:url"]')) meta.content = canonical.href;
 			}
 			resumePhase = null;
+			applyCurtain(quietRemaining);
 			setPhase("quiet");
 			quietFrame = 0;
 			native.setRunning(true);
@@ -449,15 +497,18 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		const operation = ++version;
 		try {
 			intro?.pause();
-			if (!allowed || document.hidden) { suspend("请返回页面并恢复窗口尺寸后继续。"); return; }
+			if (!apiReady) { suspend(); return; }
 			if (!native.active && !await native.enter(true)) throw new Error("实时舞台恢复失败");
 			if (operation !== version || disposed) return;
-			if (resumePhase !== "performance") { postfx.enabled = true; notesState.enabled = true; }
+			if (resumePhase !== "performance") { postfx.enabled = false; notesState.enabled = true; }
 			resumePhase = null;
 			setPhase("performance");
 			syncPresentation();
 			await native.present(true);
-			if (operation !== version || disposed || document.hidden) return;
+			if (operation !== version || disposed) return;
+			applyStageLayers();
+			// A resumed postlude can still be mid-fade: the show never starts behind a cover.
+			clearCurtain();
 			await audio.play();
 			if (operation !== version || disposed) { audio.pause(); return; }
 			native.setRunning(true);
@@ -477,7 +528,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 				await unlockSong();
 				if (operation !== version || disposed) return;
 				busy = false;
-				if (!document.hidden) await enterQuietBlog(false);
+				await enterQuietBlog(false);
 			} catch (error) { if (operation === version) showFailure(error); }
 		} else if (resumePhase === "performance") await beginPerformance();
 		else {
@@ -517,11 +568,9 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	retry.addEventListener("click", () => { failed = false; void prepare(); }, { signal });
 	window.addEventListener("resize", resize, { signal, passive: true });
 	root.addEventListener("noise-postfx-change", syncPresentation, { signal });
+	// A background tab never pauses the show: the song runs on and the stage catches up on repaint.
 	document.addEventListener("visibilitychange", () => {
-		if (document.hidden) {
-			suspend("演出已暂停，请返回页面后点击继续。");
-			if (phase === "checking" && busy) { version++; busy = false; cancelVisuals(); }
-		} else { resize(); }
+		if (!document.hidden) resize();
 	}, { signal });
 	document.addEventListener("pointermove", event => {
 		if (phase !== "performance" || event.pointerType === "touch") return;
@@ -539,7 +588,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 	audio.element.addEventListener("ended", end, { signal });
 	audio.element.addEventListener("error", () => { if (resourcesReady) showFailure("音乐播放失败"); }, { signal });
 	window.addEventListener("pagehide", event => {
-		if (event.persisted) suspend("页面已恢复，点击继续演出。");
+		if (event.persisted) suspend();
 		else dispose();
 	}, { signal });
 	window.addEventListener("pageshow", event => { if (event.persisted && !terminal) resize(); }, { signal });
@@ -553,7 +602,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 		get("noise-dismiss").addEventListener("click", browse, { signal });
 		get("noise-exit").addEventListener("click", browse, { signal });
 		get("noise-launch").addEventListener("click", () => { setPhase("checking"); resize(); }, { signal });
-		get("noise-toggle").addEventListener("click", () => suspend("开发暂停"), { signal });
+		get("noise-toggle").addEventListener("click", () => suspend(), { signal });
 		get("noise-restart").addEventListener("click", () => { contamination.reset(); resetPollution(); audio.seek(0); }, { signal });
 		get("noise-mute").addEventListener("click", () => { audio.element.muted = !audio.element.muted; }, { signal });
 		get("noise-notes").addEventListener("click", () => {
@@ -562,7 +611,7 @@ export function mountNoiseExperience(root: HTMLElement): void {
 			root.dispatchEvent(new CustomEvent("noise-notes-change"));
 		}, { signal });
 		seek.addEventListener("input", () => { contamination.reset(); resetPollution(); audio.seek(Number(seek.value) / 100 * audio.element.duration); }, { signal });
-		document.addEventListener("keydown", event => { if (event.key === "Escape") suspend("开发暂停"); }, { signal });
+		document.addEventListener("keydown", event => { if (event.key === "Escape") suspend(); }, { signal });
 	}
 	setPhase("checking");
 	resize();
